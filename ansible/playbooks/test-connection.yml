@@ -1,0 +1,15 @@
+# Run separately for individual servers as follows
+---
+- name: configs
+  become: true
+  gather_facts: no
+  hosts: kubernetes-cluster
+  ignore_unreachable: yes
+  vars:
+    ENV: "esxi"
+  vars_prompt:
+    - name: SHUTDOWN
+      prompt: Shutdown yes/no
+      private: no
+  roles:
+    - ping_role

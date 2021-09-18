@@ -1,0 +1,12 @@
+# Test connectivity
+- name: Wait for ssh
+  wait_for_connection:
+    delay: 1
+    timeout: 3
+
+- name: Test from Ansible Playbook
+  ping:
+
+- name: shutdown
+  community.general.shutdown:
+  when: SHUTDOWN == "yes"
