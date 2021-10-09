@@ -1,0 +1,2 @@
+- name: install-docker.yml
+  include: install-docker.yml
