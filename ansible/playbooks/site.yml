@@ -1,6 +1,8 @@
 ---
 - hosts: kubernetescluster
   become: true
+  vars_files:
+    - "../../local_files/ansible_extra_vars.yml"
   pre_tasks:
   - name: Install packages that allow apt to be used over HTTPS
     apt:
@@ -14,6 +16,9 @@
         - curl
         - gnupg-agent
         - software-properties-common
+
+  - debug:
+      msg: "{{ specific_node }}"
   roles:
-    - install-docker
-    - install-kubectl
+    - { role: install-docker, when: "'kubernetesmaster' in group_names" }
+    - { role: install-kubectl, when: "'kubernetesmaster' in group_names" }

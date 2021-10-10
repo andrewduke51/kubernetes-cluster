@@ -35,4 +35,5 @@ terraform.tfvars
 *.vagrant/
 *temp/
 ubuntu-xenial-16.04*
+local_files/Vagrantfile_og
 Vagrantfile
