@@ -16,3 +16,4 @@
         - software-properties-common
   roles:
     - install-docker
+    - install-kubectl
