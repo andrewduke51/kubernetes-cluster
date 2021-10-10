@@ -1,5 +1,5 @@
-- name: install-kubectl.yml
-  include: install-kubectl.yml
+- name: install-docker.yml
+  include: install-docker.yml
 
 - name: disable-swap.yml
   include: disable-swap.yml
