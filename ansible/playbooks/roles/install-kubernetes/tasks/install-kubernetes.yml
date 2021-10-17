@@ -20,14 +20,12 @@
       - kubeadm
       - kubectl
 
-- name: Configure node ip
-  lineinfile:
-    path: /etc/default/kubelet
-    line: KUBELET_EXTRA_ARGS=--node-ip={{ node_ip_master }}
-    create: yes
+- name: Initialize the Kubernetes cluster using kubeadm
+  command: kubeadm init --apiserver-advertise-address="10.244.0.0/16"
 
-- name: Restart kubelet
-  service:
-    name: kubelet
-    daemon_reload: yes
-    state: restarted
+
+#- name: Restart kubelet
+#  service:
+#    name: kubelet
+#    daemon_reload: yes
+#    state: restarted

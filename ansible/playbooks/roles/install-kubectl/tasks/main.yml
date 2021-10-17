@@ -1,5 +1,0 @@
-- name: install-kubectl.yml
-  include: install-kubectl.yml
-
-- name: initialize-kubernetes.yml
-  include: initialize-kubernetes.yml
