@@ -21,7 +21,7 @@
       - kubectl
 
 - name: Initialize the Kubernetes cluster using kubeadm
-  command: "kubeadm init --apiserver-advertise-address="10.244.0.0/16"
+  command: 'kubeadm init --apiserver-advertise-address="10.244.0.0/16"'
 
 
 #- name: Restart kubelet
