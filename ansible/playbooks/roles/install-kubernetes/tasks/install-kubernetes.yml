@@ -20,18 +20,6 @@
       - kubeadm
       - kubectl
 
-- name: Configure node ip
-  lineinfile:
-    path: /etc/default/kubelet
-    line: KUBELET_EXTRA_ARGS=--node-ip={{ master_node }}
-  when: "'kubernetesmaster' in group_names"
-
-- name: Restart kubelet
-  service:
-    name: kubelet
-    daemon_reload: yes
-    state: restarted
-
 #- name: kube-apiserver.yaml
 #  stat:
 #    path: "/etc/kubernetes/manifests/kube-apiserver.yaml"

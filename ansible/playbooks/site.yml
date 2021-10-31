@@ -22,5 +22,5 @@
       msg: "{{ master_node }}"
   roles:
     - { role: update-linux, when: "'kubernetescluster' in group_names" }
-    - { role: install-docker, when: "'kubernetescluster' in group_names" }
-    - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
+    - { role: install-docker, when: "'kubernetesmaster' in group_names" }
+#    - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
