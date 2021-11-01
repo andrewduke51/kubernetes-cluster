@@ -6,6 +6,6 @@
     - "../../local_files/ansible_extra_vars.yml"
   roles:
     - { role: update-linux, when: "'kubernetescluster' in group_names" }
-    - { role: install-docker, when: "'kubernetescluster' in group_names" }
+    - { role: install-containerd, when: "'kubernetescluster' in group_names" }
     - { role: install-kubernetes-master, when: "'kubernetesmaster' in group_names" }
 #    - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }

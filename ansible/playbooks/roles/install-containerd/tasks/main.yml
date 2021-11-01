@@ -1,0 +1,5 @@
+- name: install-containerd.yml
+  include: install-containerd.yml
+
+- name: disable-swap.yml
+  include: disable-swap.yml
