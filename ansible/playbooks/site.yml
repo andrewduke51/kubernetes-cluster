@@ -4,24 +4,8 @@
   become: true
   vars_files:
     - "../../local_files/ansible_extra_vars.yml"
-  pre_tasks:
-  - name: Install packages that allow apt to be used over HTTPS
-    apt:
-      name: "{{ packages }}"
-      state: present
-      update_cache: yes
-    vars:
-      packages:
-        - apt-transport-https
-        - ca-certificates
-        - curl
-        - gnupg-agent
-        - software-properties-common
-
-  - debug:
-      msg: "{{ master_node }}"
   roles:
-#    - { role: update-linux, when: "'kubernetescluster' in group_names" }
-#    - { role: install-docker, when: "'kubernetescluster' in group_names" }
+    - { role: update-linux, when: "'kubernetescluster' in group_names" }
+    - { role: install-docker, when: "'kubernetescluster' in group_names" }
     - { role: install-kubernetes-master, when: "'kubernetesmaster' in group_names" }
 #    - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }

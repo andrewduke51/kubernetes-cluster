@@ -8,13 +8,13 @@
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
     state: present
 
-- name: Install docker and its dependecies
-  apt:
-    name: "{{ docker_packages }}"
-    state: present
-    update_cache: yes
-  notify:
-    - docker status
+#- name: Install docker and its dependecies
+#  apt:
+#    name: "{{ docker_packages }}"
+#    state: absent
+#    update_cache: yes
+#  notify:
+#    - docker status
 
 - name: Add vagrant user to docker group
   user:
