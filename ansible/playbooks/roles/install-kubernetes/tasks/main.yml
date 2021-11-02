@@ -1,0 +1,6 @@
+- name: install-kubelet.yml
+  include: install-kubelet.yml
+
+- name: master-configs.yml
+  include: master-configs.yml
+  when: master == "yes"

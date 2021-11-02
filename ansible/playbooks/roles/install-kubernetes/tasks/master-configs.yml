@@ -1,0 +1,19 @@
+- name: kube-apiserver.yaml
+  stat:
+    path: "/etc/kubernetes/pki/"
+  register: register_name
+
+- debug:
+    msg: "{{ register_name.stat.exists }}"
+
+- name: Initialize the Kubernetes cluster using kubeadm
+  command: "sudo kubeadm init"
+  delegate_to: "k8s-master-01"
+  when: "not register_name.stat.exists"
+
+#- name: Setup kubeconfig for vagrant user
+#  command: "{{ item }}"
+#  with_items:
+#    - mkdir -p /home/vagrant/.kube
+#    - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+#    - chown vagrant:vagrant /home/vagrant/.kube/config

@@ -1,2 +1,0 @@
-- name: install-kubernetes.yml
-  include: install-kubernetes.yml
