@@ -11,6 +11,8 @@
   delegate_to: "k8s-master-01"
   when: "not register_name.stat.exists"
 
+
+
 #- name: Setup kubeconfig for vagrant user
 #  command: "{{ item }}"
 #  with_items:

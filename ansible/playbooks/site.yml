@@ -1,10 +1,11 @@
-# ansible-playbook -i local_files/inventory ansible/playbook/site.yml
+# ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 ---
 - hosts: all
   become: true
   vars_files:
     - "../../local_files/ansible_extra_vars.yml"
   roles:
+    - { role: pub-key, when: "'kubernetescluster' in group_names" }
     - { role: update-linux, when: "'kubernetescluster' in group_names" }
     - { role: install-containerd, when: "'kubernetescluster' in group_names" }
-    - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
+#    - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
