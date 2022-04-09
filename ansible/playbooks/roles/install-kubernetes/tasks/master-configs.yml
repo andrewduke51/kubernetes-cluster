@@ -6,10 +6,21 @@
 - debug:
     msg: "{{ register_name.stat.exists }}"
 
+- debug:
+    msg: "{{ ansible_host }}"
+
 - name: Initialize the Kubernetes cluster using kubeadm
-  command: "sudo kubeadm init"
+  script: "kubeadm.sh {{ ansible_host }}"
   delegate_to: "k-master"
   when: "not register_name.stat.exists"
+
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: /home/vagrant/.kube
+    owner: vagrant
+    group: vagrant
+    state: directory
+    mode: '0755'
 
 - name: Setup kubeconfig for vagrant user
   ansible.builtin.copy:

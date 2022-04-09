@@ -4,3 +4,7 @@
 - name: master-configs.yml
   include: master-configs.yml
   when: master == "yes"
+
+- name: join-nodes.yml
+  include: join-nodes.yml.yml
+  when: master == "no"
