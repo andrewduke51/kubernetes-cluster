@@ -11,11 +11,11 @@
   delegate_to: "k8s-master-01"
   when: "not register_name.stat.exists"
 
-
-
-#- name: Setup kubeconfig for vagrant user
-#  command: "{{ item }}"
-#  with_items:
-#    - mkdir -p /home/vagrant/.kube
-#    - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
-#    - chown vagrant:vagrant /home/vagrant/.kube/config
+- name: Setup kubeconfig for vagrant user
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/vagrant/.kube/config
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+    remote_src: yes

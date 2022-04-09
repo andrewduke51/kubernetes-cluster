@@ -8,4 +8,4 @@
     - { role: pub-key, when: "'kubernetescluster' in group_names" }
     - { role: update-linux, when: "'kubernetescluster' in group_names" }
     - { role: install-containerd, when: "'kubernetescluster' in group_names" }
-#    - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
+    - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
