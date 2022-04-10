@@ -1,9 +1,11 @@
 - debug:
-    msg:  "{{ master }}"
+    msg:  "{{ master_ip }}"
   run_once: yes
 
-#- name: Ansible insert a line before example
-#  lineinfile:
-#    path: /etc/hosts
-#    line: '0.0.0.0  kube-api.local'
-#  when: nodes == "yes"
+- name: Ansible insert a line before example
+  lineinfile:
+    path: /etc/hosts
+    state: present
+    line: "{{ master_ip }}  kube-api.local"
+
+  when: nodes == "yes"

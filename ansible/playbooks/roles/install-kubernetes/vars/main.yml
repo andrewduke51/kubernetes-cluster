@@ -3,4 +3,4 @@ a_list_vars:
   - some_value2
   - some_value3
 
-master:  "{{ hostvars['k-master']['ansible_host'] }}"
+master_ip:  "{{ hostvars['k-master']['ansible_host'] }}"
