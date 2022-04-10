@@ -7,5 +7,4 @@
     path: /etc/hosts
     state: present
     line: "{{ master_ip }}  kube-api.local"
-
-  when: nodes == "yes"
+  when: master == "no"
