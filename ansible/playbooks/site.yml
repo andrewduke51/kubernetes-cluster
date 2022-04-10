@@ -9,3 +9,10 @@
     - { role: update-linux, when: "'kubernetescluster' in group_names" }
     - { role: install-containerd, when: "'kubernetescluster' in group_names" }
     - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
+
+  post_tasks:
+    - name: Run kubectl get nodes
+      become: false
+      command: "kubectl get nodes"
+      delegate_to: localhost
+      run_once: true
