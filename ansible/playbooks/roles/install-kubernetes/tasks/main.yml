@@ -6,5 +6,4 @@
   when: master == "yes"
 
 - name: join-nodes.yml
-  include: join-nodes.yml.yml
-  when: master == "no"
+  include: join-nodes.yml
