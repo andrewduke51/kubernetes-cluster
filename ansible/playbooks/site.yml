@@ -13,10 +13,11 @@
   post_tasks:
     - name: Run kubectl get nodes
       become: false
+      connection: local
       command: "kubectl get nodes"
       delegate_to: localhost
       register: command_output
-      run_once: true
+      run_once:  True
 
     - debug:
         msg: "{{ command_output.stdout_lines }}"
