@@ -15,4 +15,8 @@
       become: false
       command: "kubectl get nodes"
       delegate_to: localhost
+      register: command_output
       run_once: true
+
+    - debug:
+        msg: "{{ command_output.stdout_lines }}"
