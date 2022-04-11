@@ -3,7 +3,7 @@
 - hosts: all
   become: true
   vars_files:
-    - "../../local_files/ansible_extra_vars.yml"
+    - "../../local_files/ansible_local_vars.yml"
   roles:
     - { role: pub-key, when: "'kubernetescluster' in group_names" }
     - { role: update-linux, when: "'kubernetescluster' in group_names" }
