@@ -5,5 +5,15 @@
   include: master-configs.yml
   when: master == "yes"
 
+- name: copy weave-net.yaml
+  copy:
+    src: weave-net.yaml
+    dest: /tmp/weave-net.yaml
+  when: master == "yes"
+
+- name: Pre-Requisite networking kubernetes weavenet
+  command: "kubectl apply -f /tmp/weave-net.yaml --kubeconfig={{ kubeadmin_config }}"
+  when: master == "yes"
+
 - name: join-nodes.yml
   include: join-nodes.yml

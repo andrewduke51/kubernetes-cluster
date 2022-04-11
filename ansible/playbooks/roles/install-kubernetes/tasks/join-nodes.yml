@@ -9,6 +9,6 @@
     line: "{{ master_ip }}  kube-api.local"
   when: master == "no"
 
-- name: join node
-  command: "kubeadm join kube-api.local:6443 --token {{ kube_token }} --discovery-token-ca-cert-hash {{ token_cert_hash }}"
-  when: master == "no"
+#- name: join node
+#  script: "join.sh {{ kube_token }} {{ token_cert_hash }}"
+#  when: master == "no"
