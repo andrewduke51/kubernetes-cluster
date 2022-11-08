@@ -1,0 +1,31 @@
+- debug:
+    msg:  "{{ master_ip }}"
+  run_once: yes
+
+- name: Ansible insert a line before example
+  lineinfile:
+    path: /etc/hosts
+    state: present
+    line: "{{ master_ip }}  kube-api.local"
+  when: master == "no"
+
+- name: check if file exists
+  stat:
+    path: /etc/containerd/done
+  register: joined
+
+- name: join node
+  shell: "kubeadm join kube-api.local:6443 --token {{ join_token }} --discovery-token-unsafe-skip-ca-verification"
+  when: master == "no" and joined.stat.exists == False
+
+- name: create /etc/containerd/done
+  ansible.builtin.file:
+    path: /etc/containerd/done
+    state: touch
+  when: joined.stat.exists == False
+
+- name: Remove file
+  ansible.builtin.file:
+    path: /tmp/run_kube_init.sh
+    state: absent
+  when: master == "no"

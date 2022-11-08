@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name_space }}-deployment
+  namespace: {{ .Values.name_space }}
+  labels:
+    app: {{ .Values.name_space }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ .Values.name_space }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name_space }}
+    spec:
+      containers:
+        - name: {{ .Values.name_space }}
+          image: andrewduke51/app:latest
+          ports:
+            - containerPort: 5000

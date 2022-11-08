@@ -1,0 +1,51 @@
+version: 2.1
+jobs:
+  deployment:
+    machine: true
+    resource_class: dukesofhazards/runner
+    environment:
+      - ANSIBLE_HOST_KEY_CHECKING: False
+    working_directory: ~
+    steps:
+      - checkout
+      - run:
+          name: build env and make local_files directory
+          environment:
+            - SOMEVAR: placeholder
+          command: |
+            chmod +x ops/*sh
+            ops/env.sh ${SOMEVAR}
+            #ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
+            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
+      - run:
+          name: Build Docker Container with Flask App
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            cd flask-app
+            docker build -t andrewduke51/app:latest .
+            docker push andrewduke51/app:latest
+      - run:
+          name: Install weavenet.yaml
+          command: kubectl apply -f deployments/weavenet.yaml
+      - run:
+          name: deploying App with HELM
+          command: |
+            ops/helm upgrade --install app \
+              --values HELM/app-values.yaml HELM
+            kubectl rollout restart deployment/app-deployment -n app
+      - run:
+          name: Rollout Database Statefulset
+          command: |
+            kubectl apply -f deployments/database.yaml
+            kubectl rollout restart statefulset/mongo-statefulset -n mongo
+
+      - run:
+          name: Config reverse-proxy
+          command: |
+            ansible-playbook -i local_files/inventory ansible/playbooks/nginx.yml
+
+workflows:
+  version: 2.1
+  init_and_deploy:
+    jobs:
+      - deployment

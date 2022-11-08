@@ -1,0 +1,94 @@
+## namespace ##
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: mongo
+  labels:
+    name: mongo
+---
+## pv ##
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo0-pv
+  labels:
+    type: local-mongo
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/data/pods/mongo0"
+---
+## statefulset ##
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-statefulset
+  namespace: mongo
+  labels:
+    app: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  serviceName: mongo-service
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "500m"
+            limits:
+              memory: "600Mi"
+              cpu: "1"
+          ports:
+            - containerPort: 27017
+              name: mongodb
+          volumeMounts:
+            - name: mongo-pvc
+              mountPath: /data/mongodb
+      imagePullSecrets:
+        - name: registrycred
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-pvc
+      spec:
+        storageClassName: standard # managed-premium
+        accessModes:
+          - ReadWriteMany
+        resources:
+          requests:
+            storage: 5Gi
+        selector:
+          matchLabels:
+            type: local-mongo
+---
+## service ##
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+  namespace: mongo
+  labels:
+    app: mongo
+spec:
+  type: LoadBalancer
+  selector:
+    app: mongo
+  ports:
+    - name: mongodb
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
+      nodePort: 31654

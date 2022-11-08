@@ -1,0 +1,3 @@
+## NGINX ##
+- name: Include nginx-config.yml
+  include_tasks: nginx-config.yml

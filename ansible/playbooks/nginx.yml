@@ -1,0 +1,15 @@
+# install nginx: https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/How-to-setup-Nginx-reverse-proxy-servers-by-example
+# Use self signed: https://www.thegeekstuff.com/2009/07/linux-apache-mod-ssl-generate-key-csr-crt-file/
+---
+- name: configs
+  become: true
+  gather_facts: yes
+  hosts: nginx
+  vars:
+    ENV: "esxi"
+  roles:
+    - nginx
+
+
+
+

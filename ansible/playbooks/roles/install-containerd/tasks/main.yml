@@ -1,0 +1,15 @@
+- name: check for containerd.conf
+  stat:
+    path: "/etc/modules-load.d/containerd.conf"
+  register: file_exist
+
+- debug:
+    msg: "{{ file_exist.stat.exists }}"
+
+- name: install-containerd.yml
+  include_tasks: install-containerd.yml
+  when: "not file_exist.stat.exists"
+
+- name: disable-swap.yml
+  include_tasks: disable-swap.yml
+  when: "not file_exist.stat.exists"

@@ -1,0 +1,38 @@
+# ansible-playbook -i local_files/inventory ansible/playbooks/test-connection.yml
+# Run separately for individual servers as follows
+---
+- name: configs
+  become: true
+  gather_facts: yes
+  hosts: kubernetescluster
+  ignore_unreachable: yes
+  vars:
+    ENV: "esxi"
+  vars_prompt:
+    - name: SHUTDOWN
+      prompt: Shutdown yes/no
+      private: no
+  roles:
+    - ping_role
+
+  post_tasks:
+    - name: create vagrant user
+      ansible.builtin.user:
+        name: vagrant
+        groups: sudo
+        shell: /bin/bash
+        append: yes
+
+    - name: Validate the sudoers file before saving
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%sudo ALL='
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: /usr/sbin/visudo -cf %s
+
+    - name: Set authorized key token from file
+      ansible.posix.authorized_key:
+        user: vagrant
+        state: present
+        key: "{{ lookup('file', 'roles/pub-key/files/vagrant.pub') }}"

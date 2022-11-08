@@ -1,0 +1,32 @@
+- name: kube-apiserver.yaml
+  stat:
+    path: "/etc/kubernetes/pki/"
+  register: register_name
+
+- debug:
+    msg: "{{ register_name.stat.exists }}"
+
+- debug:
+    msg: "{{ ansible_host }}"
+
+- name: Initialize the Kubernetes cluster using kubeadm
+  script: "kubeadm.sh {{ ansible_host }}"
+  delegate_to: "k-master"
+  when: "not register_name.stat.exists"
+
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: /home/vagrant/.kube
+    owner: vagrant
+    group: vagrant
+    state: directory
+    mode: '0755'
+
+- name: Setup kubeconfig for vagrant user
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/vagrant/.kube/config
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+    remote_src: yes

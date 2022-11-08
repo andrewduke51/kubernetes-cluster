@@ -1,0 +1,30 @@
+# ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
+---
+- hosts: all
+  become: true
+  vars_files:
+    - "../../local_files/ansible_local_vars.yml"
+  roles:
+    - { role: pub-key, when: "'kubernetescluster' in group_names" }
+    - { role: update-linux, when: "'kubernetescluster' in group_names" }
+    - { role: install-containerd, when: "'kubernetescluster' in group_names" }
+    - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
+
+  post_tasks:
+    - name: Get kube config file
+      ansible.builtin.fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: ~/.kube/config
+        flat: yes
+      when: master == "yes"
+
+- hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Run kubectl get nodes
+      become: false
+      command: "kubectl get nodes"
+      register: command_output
+
+    - debug:
+        msg: "{{ command_output.stdout_lines }}"

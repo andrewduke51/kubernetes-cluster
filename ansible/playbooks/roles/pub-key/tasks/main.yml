@@ -1,0 +1,29 @@
+- name: make direcotry
+  file:
+    path: "/home/vagrant/.ssh"
+    state: directory
+
+- name: Set authorized key taken from file
+  ansible.posix.authorized_key:
+    user: vagrant
+    state: present
+    key: "{{ lookup('file', 'files/vagrant.pub') }}"
+
+- name: Ensuring that wheel is able to use sudo without password
+  lineinfile:
+    path: /etc/sudoers
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: disable username and password login
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication no"
+    state: present
+
+- name: Restart sshd
+  ansible.builtin.service:
+    name: ssh
+    state: restarted

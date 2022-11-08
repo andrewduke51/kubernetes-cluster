@@ -1,0 +1,6 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: {{ .Values.name_space }}
+  labels:
+    name: {{ .Values.name_space }}

@@ -1,0 +1,39 @@
+- name: containerd.conf
+  copy:
+    src: "containerd.conf"
+    dest: "/etc/modules-load.d/containerd.conf"
+
+- name: modprobe
+  command: "{{ item }}"
+  with_items:
+    - sudo modprobe overlay
+    - sudo modprobe br_netfilter
+
+- name: 99-kubernetes-cri.conf
+  copy:
+    src: "99-kubernetes-cri.conf"
+    dest: "/etc/sysctl.d/99-kubernetes-cri.conf"
+
+- name: sudo sysctl --system
+  command: "sudo sysctl --system"
+
+- name: Install container.d
+  apt:
+    name: containerd
+    update_cache: yes
+
+- name: Create a directory /etc/containerd
+  ansible.builtin.file:
+    path: /etc/containerd
+    state: directory
+    mode: '0755'
+
+- name: config.toml
+  copy:
+    src: "config.toml"
+    dest: "/etc/containerd/config.toml"
+
+- name: Start service containerd
+  ansible.builtin.service:
+    name: containerd
+    state: started
