@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: {{ .Values.name_space }}
-          image: andrewduke51/app:latest
+          image: {{ .Values.image_name }}
           ports:
             - containerPort: 5000

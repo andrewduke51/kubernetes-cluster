@@ -1,3 +1,4 @@
+image_name: andrewduke51/app:latest
 name_space: app
 service_type: LoadBalancer
 node_port: 31653
