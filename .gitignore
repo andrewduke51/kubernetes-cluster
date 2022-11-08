@@ -18,6 +18,8 @@ ansible/playbooks/local_site.yml
 *flush_dns.sh
 *pip.sh
 .DS_Store
+-secret*
+*secret*
 python_versions/
 vars.yml
 *bootstrap.sh*
