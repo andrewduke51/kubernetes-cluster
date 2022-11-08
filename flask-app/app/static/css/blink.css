@@ -1,0 +1,9 @@
+.blink {
+    animation: condemned_blink_effect 1s linear infinite;
+}
+
+@keyframes condemned_blink_effect {
+    100% {
+        opacity: 0;
+    }
+}

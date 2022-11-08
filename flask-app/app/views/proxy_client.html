@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Flask Docker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/blink.css') }}">
 </head>
 <body>
 <center><font size="1px"><h1>This Flask App is containerized with Docker: Hi, I am a Python Flask Website running on Kubernetes!
@@ -11,5 +11,5 @@
 </body>
 <center><img src="{{url_for('static', filename='ci_cd.jpeg')}}" alt="pic" width="1050" height="400" /><center>
     <font size="100px"><a href="https://drive.google.com/file/d/1ZPGAKLyJXCPAfDbMYVb6AiuQVjqJhORH/view?usp=sharing">Click here for my resume!</a></font>
-    <center><SPAN STYLE="text-decoration:blink"><h4><p style="color:red;">Ask me for the password...</p></h4></SPAN></SPAN><center>
+    <center><h4><div class="blink"><p style="color:#e51111;">Ask me for the password...</p></div></div></h4><center></span>
 </html>
