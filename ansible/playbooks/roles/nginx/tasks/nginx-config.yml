@@ -1,6 +1,9 @@
 - name: Allow cloudflare IPS only
   script: cloudflare_ips.sh
 
+- name: config 4 hourly cron
+
+
 - name: delete default file
   ansible.builtin.file:
     path: /etc/nginx/sites-available/default

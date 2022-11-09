@@ -13,7 +13,7 @@ mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
 ipcollection = visitorsdb["visitors"]
 
-@app.route('/', methods=["GET", "POST"])
+@app.route('/', methods=["GET"])
 def index():
     captured = {
         "time_stamp" : datetime.now(),
