@@ -16,7 +16,7 @@
 - name: Ensure a cf job that runs at 2 and 5 exists. Creates an entry like "0 5,2 * * ls -alh > /dev/null"
   ansible.builtin.cron:
     name: "update cloudflare IPS"
-    minute: "*"
+    minute: "0"
     hour: "*/4"
     job: "/post_scripts/cloudflare_ips.sh"
 
