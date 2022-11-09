@@ -2,14 +2,10 @@ from flask import Flask, render_template, jsonify, request
 from multiprocessing import Value
 from datetime import datetime
 import pymongo
-import logging
 import socket
 import json
 import os
 
-app.logger.disabled = True
-log = logging.getLogger('werkzeug')
-log.disabled = True
 
 # Variables ##
 app = Flask(__name__, template_folder='views')
