@@ -17,7 +17,7 @@ ipcollection = visitorsdb["visitors"]
 @app.route('/', methods=["GET"])
 def index():
     captured = {
-        "time_stamp" : (datetime.now().strftime("%m/%d/%y - %H:%M:%S"),
+        "time_stamp" : datetime.now().strftime("%m/%d/%y - %H:%M:%S"),
         "ip_addresses" : request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
     }
     ipcollection.insert_one(captured)
