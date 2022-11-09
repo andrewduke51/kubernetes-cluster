@@ -43,7 +43,7 @@ spec:
     spec:
       containers:
         - name: mongo
-          image: mongo:latest
+          image: mongo:latest         # https://hub.docker.com/_/mongo
           imagePullPolicy: Always
           resources:
             requests:
