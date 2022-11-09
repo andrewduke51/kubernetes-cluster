@@ -15,6 +15,11 @@ ipcollection = visitorsdb["visitors"]
 
 @app.route('/', methods=["GET", "POST"])
 def index():
+    captured = {
+        "time_stamp" : datetime.now(),
+        "ip_addresses" : request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+    }
+    ipcollection.insert_one(captured)
     return render_template('index.html')
 
 
