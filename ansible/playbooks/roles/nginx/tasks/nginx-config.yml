@@ -1,8 +1,24 @@
 - name: Allow cloudflare IPS only
   script: cloudflare_ips.sh
 
-- name: config 4 hourly cron
+- name: Create a directory postscripts
+  ansible.builtin.file:
+    path: /post_scripts
+    state: directory
+    mode: '0755'
 
+- name: config 4 hourly cron
+  ansible.builtin.copy:
+    src: cloudflare_ips.sh
+    dest: /post_scripts
+    mode: u=rwx,g=rx,o=rx
+
+- name: Ensure a cf job that runs at 2 and 5 exists. Creates an entry like "0 5,2 * * ls -alh > /dev/null"
+  ansible.builtin.cron:
+    name: "update cloudflare IPS"
+    minute: "*"
+    hour: "*/4"
+    job: "/post_scripts/cloudflare_ips.sh"
 
 - name: delete default file
   ansible.builtin.file:
