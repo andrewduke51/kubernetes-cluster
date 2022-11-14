@@ -2,7 +2,7 @@
 
 # set config
 mkdir ../local_files
-echo "${CONFIG}" | base64 -d > config
+echo "${CONFIG}" | base64 -d > ${CIRCLE_WORKING_DIRECTORY}/ops/config
 chmod go-r config
 
 # set ansible_local_vars
