@@ -53,6 +53,12 @@
     - circleci
     - vagrant
 
+- name: Download docker-compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)"
+    dest: "/usr/local/bin"
+    mode: u=rwx,g=rx,o=rx
+
 - name: start docker
   systemd:
     name: docker
