@@ -1,0 +1,11 @@
+ansible
+azure-cli
+azure-cli-core
+azure-mgmt-storage
+jinja2
+nagiosplugin
+passlib
+pymongo
+six
+xmltodict
+zktop

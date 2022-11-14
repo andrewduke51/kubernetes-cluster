@@ -1,0 +1,8 @@
+api:
+  auth_token: {{ CI_TOKEN }}
+
+runner:
+  name: {{ RUNNER_NAME  }}
+  command_prefix: ["sudo", "-niHu", "circleci", "--"]
+  working_directory: /opt/circleci/workdir/%s
+  cleanup_working_directory: true

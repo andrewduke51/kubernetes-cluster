@@ -1,0 +1,6 @@
+- name: Install circleci-runner
+  include: circleci-runner.yml
+
+- name: run vagrant script.sh
+  script: "vagrant.sh {{ circleci_runner }} sytrue-runner"
+  when: vagrant == 'yes'

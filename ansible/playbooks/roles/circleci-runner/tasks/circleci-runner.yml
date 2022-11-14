@@ -1,0 +1,62 @@
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: circleci
+    group: circleci
+  with_items:
+    - "/opt/circleci"
+    - "/opt/circleci/workdir"
+    - "/opt/circleci/policy"
+    - "/opt/bin"
+
+- name: Install circleci dependencies
+  yum:
+    state: present
+    enablerepo: epel-testing,PowerTools
+    update_cache: yes
+    name:
+      - "policycoreutils-devel"
+      - "rpm-build"
+
+- name: install circleci-launch-agent
+  script: "script.sh"
+
+- name: Unarchive circleci zip
+  unarchive:
+    src: "{{ circleci_url }}"
+    dest: "/opt/bin"
+    remote_src: "yes"
+
+- name: Create a symbolic link for circleci
+  ansible.builtin.file:
+    src: "/opt/bin/circleci-cli_{{ circleci_version }}_linux_amd64/circleci"
+    dest: /usr/bin/circleci
+    state: link
+
+- name: add launch-agent-config.yaml
+  copy:
+    src: "launch-agent-config.yaml"
+    dest: "/opt/circleci/launch-agent-config.yaml"
+    mode: 600
+
+- name: add circleci.service
+  copy:
+    src: "circleci.service"
+    dest: "/etc/systemd/system/circleci.service"
+    mode: 600
+
+- name: add ssh config file
+  copy:
+    src: "ssh_config"
+    dest: "/home/circleci/.ssh/config"
+    owner: "circleci"
+    group: "circleci"
+    mode: 0600
+
+- name: start circleci.service
+  service:
+    name: "circleci"
+    state: "restarted"
+    enabled: "yes"

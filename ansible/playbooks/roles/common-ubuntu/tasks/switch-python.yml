@@ -1,0 +1,12 @@
+- name: link /usr/bin/python
+  ansible.builtin.file:
+    src: /virtual-python/shims/python
+    dest: "/usr/bin/python"
+    state: link
+    force: yes
+
+- name: link updated pip
+  file:
+    src: "{{ pip }}"
+    dest: "/usr/bin/pip"
+    state: link

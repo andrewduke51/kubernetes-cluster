@@ -26,6 +26,7 @@ vars.yml
 notes
 local_files/
 crash.log
+local_sites.yml
 
 *.pem
 *terraform.tfstate

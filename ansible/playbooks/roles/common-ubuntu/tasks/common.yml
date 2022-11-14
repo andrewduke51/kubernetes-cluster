@@ -1,0 +1,19 @@
+- name: "Create user accounts and add users to groups"
+  user:
+    name: "{{ item }}"
+    groups: "sudo,adm"
+  with_items: "{{ users }}"
+
+- name: "Add authorized keys"
+  authorized_key:
+    user: "{{ item }}"
+    key: "{{ lookup('file', 'files/pub_keys/'+ item + '.key.pub') }}"
+  with_items: "{{ users }}"
+
+- name: "Allow admin users to sudo without a password"
+  lineinfile:
+    dest: "/etc/sudoers"
+    state: "present"
+    regexp: "^%sudo"
+    line: "%sudo ALL=(ALL) NOPASSWD: ALL"
+    validate: "/usr/sbin/visudo -cf %s"

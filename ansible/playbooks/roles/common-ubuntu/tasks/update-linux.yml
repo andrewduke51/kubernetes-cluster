@@ -1,0 +1,72 @@
+- name: Install packages that allow apt to be used over HTTPS
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+
+- name: Upgrade the OS (apt-get dist-upgrade)
+  apt:
+    upgrade: dist
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+
+- name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Pass options to dpkg on run
+  apt:
+    upgrade: dist
+    update_cache: yes
+    dpkg_options: 'force-confold,force-confdef'
+
+## PYENV INSTALL ##
+- name: Create a virtual-python directory
+  ansible.builtin.file:
+    path: "/virtual-python"
+    state: directory
+    mode: "0755"
+
+- name: Git checkout pyenv
+  ansible.builtin.git:
+    repo: "https://github.com/pyenv/pyenv.git"
+    dest: "/virtual-python"
+
+- name: set PATH systemwide
+  become: true
+  copy:
+    src: "pyenv-path.sh"
+    dest: "/etc/profile.d/pyenv-path.sh"
+
+- name: set pyenv exec permissions
+  file:
+    dest: "/virtual-python"
+    owner: "root"
+    group: "sudo"
+    mode: u=rwX,g=rwX,o=rX
+    recurse: yes
+    state: directory
+
+- name: source /etc/profile.d/pyenv-path.sh
+  shell: ". /etc/profile.d/pyenv-path.sh"
+
+- name: pyenv install 2.7.18
+  shell: ". /etc/profile.d/pyenv-path.sh && /virtual-python/bin/pyenv install 2.7.15 -s"
+
+- name: pyenv install 3.8.4
+  shell: ". /etc/profile.d/pyenv-path.sh && /virtual-python/bin/pyenv install 3.8.4 -s"
+
+- name: pyenv install 3.10.0
+  shell: ". /etc/profile.d/pyenv-path.sh && /virtual-python/bin/pyenv install 3.10.0 -s"
+
+- name: pyenv install set global python
+  shell: ". /etc/profile.d/pyenv-path.sh && /virtual-python/bin/pyenv global 3.10.0"
+
+- name: install pip
+  shell: "{{ item }}"
+  with_items:
+    - "curl https://bootstrap.pypa.io/get-pip.py --output /tmp/get-pip.py"
+    - "/virtual-python/shims/python /tmp/get-pip.py"

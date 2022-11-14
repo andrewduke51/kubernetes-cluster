@@ -1,0 +1,18 @@
+- name: copy requirements.txt
+  copy:
+    src: "requirements.txt"
+    dest: "/tmp/requirements.txt"
+
+- name: pip install requirements
+  pip:
+    requirements: /tmp/requirements.txt
+    executable: /virtual-python/shims/pip
+    umask: "0022"
+    extra_args: --no-cache-dir
+
+- name: install ansible-galaxy collection community.general
+  shell: "{{ item }}"
+  with_items:
+    - ". /etc/profile.d/pyenv-path.sh && ansible-galaxy collection install community.general"
+    - ". /etc/profile.d/pyenv-path.sh && ansible-galaxy collection install ansible.posix"
+    - ". /etc/profile.d/pyenv-path.sh && ansible-galaxy collection install azure.azcollection"

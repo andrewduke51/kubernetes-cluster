@@ -1,0 +1,20 @@
+- name: common.yml
+  include_tasks: common.yml
+
+- name: update-linux.yml
+  include_tasks: update-linux.yml
+
+- name: switch-python.yml
+  include_tasks: switch-python.yml
+
+- name: install-ansible.yml
+  include_tasks: install-ansible.yml
+
+- name: cicd-runner.yml
+  include_tasks: cicd-runner.yml
+
+- name: cicd-tools.yml
+  include_tasks: cicd-tools.yml
+
+- name: install-docker.yml
+  include_tasks: install-docker.yml
