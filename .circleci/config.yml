@@ -30,7 +30,7 @@ jobs:
       - run:
           name: deploying App with HELM
           command: |
-            ops/helm upgrade --install app \
+            helm upgrade --install app \
               --values HELM/app-values.yaml HELM
             kubectl rollout restart deployment/app-deployment -n app
       - run:
