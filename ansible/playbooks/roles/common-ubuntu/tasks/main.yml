@@ -1,3 +1,9 @@
+- name: Ansible insert a line before
+  lineinfile:
+    path: /etc/hosts
+    state: present
+    line: "{{ master_ip }}  kube-api.local"
+
 - name: common.yml
   include_tasks: common.yml
 
