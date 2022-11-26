@@ -14,6 +14,9 @@ mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
 ipcollection = visitorsdb["visitors"]
 
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 @app.route('/', methods=["GET"])
 def index():
     captured = {
@@ -21,7 +24,7 @@ def index():
         "ip_addresses" : request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
     }
     ipcollection.insert_one(captured)
-    return render_template('index.html')
+    return render_template('404.html')
 
 
 @app.route("/clicknext")
