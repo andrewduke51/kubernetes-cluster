@@ -27,9 +27,9 @@ def index():
     }
     ipcollection.insert_one(captured)
     return render_template('landing.html')
-@app.route('/extra-html/test1.html')
+@app.route('/extra-html/')
 def blog1():
-    return render_template('extra-html/blog1.html')
+    return render_template('extra-html/')
 
 @app.route("/clicknext")
 def home():
