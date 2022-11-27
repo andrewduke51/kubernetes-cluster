@@ -35,7 +35,7 @@ def blog1():
 
 ## BLOG 2 ##
 @app.route('/extra-html/blog2.html')
-def blog1():
+def blog2():
     return render_template('extra-html/blog2.html')
 
 @app.route("/clicknext")
