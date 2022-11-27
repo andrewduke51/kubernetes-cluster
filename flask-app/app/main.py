@@ -28,16 +28,6 @@ def index():
     ipcollection.insert_one(captured)
     return render_template('landing.html')
 
-## BLOG 1 ##
-@app.route('/blog1.html')
-def blog1():
-    return render_template('blog1.html')
-
-## BLOG 2 ##
-@app.route('/blog2.html')
-def blog2():
-    return render_template('blog2.html')
-
 @app.route("/clicknext")
 def home():
     captured = {
