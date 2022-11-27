@@ -29,14 +29,14 @@ def index():
     return render_template('landing.html')
 
 ## BLOG 1 ##
-@app.route('/extra-html/blog1.html')
+@app.route('/blog1.html')
 def blog1():
-    return render_template('extra-html/blog1.html')
+    return render_template('blog1.html')
 
 ## BLOG 2 ##
-@app.route('/extra-html/blog2.html')
+@app.route('/blog2.html')
 def blog2():
-    return render_template('extra-html/blog2.html')
+    return render_template('blog2.html')
 
 @app.route("/clicknext")
 def home():
