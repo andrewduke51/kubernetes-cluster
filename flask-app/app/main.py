@@ -29,7 +29,7 @@ def index():
     return render_template('landing.html')
 @app.route('/extra-html/test1.html')
 def blog1():
-    return render_template('extra-html/test1.html')
+    return render_template('extra-html/blog1.html')
 
 @app.route("/clicknext")
 def home():
