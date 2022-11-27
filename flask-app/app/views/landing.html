@@ -1,14 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<div id="retainable-rss-embed"
-     data-rss="https://medium.com/feed/retainable,
-https://medium.com/feed/vue-mastery"
-     data-maxcols="3"
-     data-layout="grid"
-     data-poststyle="inline"
-     data-readmore="Read the rest"
-     data-buttonclass="btn btn-primary"
-     data-offset="-100"></div>
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
 </head>
@@ -54,9 +45,8 @@ https://medium.com/feed/vue-mastery"
         </div>
         <div class="card">
             <h3>Popular Posts</h3>
-            <div class="fakeimg">Image</div><br>
-            <div class="fakeimg">Image</div><br>
-            <div class="fakeimg">Image</div>
+            <blockquote class="embedly-card"><h4><a href="https://dev.to/techworld_with_nana/run-pod-with-root-privileges-41n9">Run Kubernetes Pod with root privileges (not recommended)</a></h4><p>Most Docker containers and the processes inside run with non-root user, because of better security. If the container process is running with root (uid 0) it will be the same root as on the host. In this case user may get access to host from the container, thus gaining the root privilege on the host.</p></blockquote>
+            <script async src="//cdn.embedly.com/widgets/platform.js" charset="UTF-8"></script>
         </div>
         <div class="card">
             <h3>Follow me on Twitter</h3>
@@ -66,7 +56,6 @@ https://medium.com/feed/vue-mastery"
 </div>
 
 <footer>
-    <script src="https://www.twilik.com/assets/retainable/rss-embed/retainable-rss-embed.js"></script>
     <p>Author: Andrewduke51</p>
     &copy; Copyright 2022
 </footer>
