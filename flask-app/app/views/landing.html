@@ -24,28 +24,27 @@
             <h2>Zookeeper deployed on Kubernetes</h2>
             <h5>The recommended version from <a href="https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/">link</a> , Dec 4, 2022</h5>
             <img src="{{url_for('static', filename='kpluszk.jpeg')}}" style="height:200px;">
-            <iframe src="blog1.html" title="blog1"></iframe>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">The problem:&nbsp;</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">In one of my projects, I had to containerize a monolithic Application into micro services. Obviously, I faced many challenges. But for this blog I will discuss the challenge I faced with an ensemble of 3 zookeepers on Virtual Machines that needed to run on containers.</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">Like everyone else I started by going over the Kubernetes documentation and fortunately I found an example that is specifically written for zookeepers. So, I first thought, wow finally; most of the work is already done&nbsp;</span><span style="font-size:19px;font-family:Wingdings;"></span><span style="font-size:19px;font-family:Consolas;">.</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">However, I found that the provided solution from the Kubernetes example and documentation to populate zookeepers <span style="color:#2F5597;">myid</span> file was causing issues each time that I deploy an update to the zookeeper ensemble on Kubernetes.&nbsp;</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">Notably, the StatefulSet pvc (persistent volume claim) may have had a previous id of 1 and will now use id 2 after deployment since the pvc will mount to a random new pod that gets scheduled to start. which in turn lead to the SOLR cluster to lose data and also entire collections!!</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">Here is the example two-part snippet from <a href="https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/">zookeeper on kubernetes.io</a>.</span></p>
+            <p style='margin:0in;font-size:16px;'><span style='font-family:"Courier New";'>&nbsp;</span></p>
+            <p style='margin:0in;font-size:16px;background:#E7E6E6;'><span style='font-size:19px;font-family:"Courier New";color:black;'>for i in 0 1 2;<br>&nbsp; &nbsp;do echo &quot;myid zk-$i&quot;;<br>&nbsp; &nbsp; &nbsp; kubectl exec zk-$i -- cat /var/lib/zookeeper/data/myid;<br>&nbsp; &nbsp;done</span></p>
+            <p style='margin:0in;font-size:16px;'><span style='font-family:"Courier New";'>&nbsp;</span></p>
+            <p style='margin:0in;font-size:16px;'><span style='font-family:"Courier New";'>&nbsp;</span></p>
+            <p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">As you can see, the snippet above also depends on having the binary for kubectl installed. Which I wanted to avoid since; I try to follow the principle of &ldquo;less is more&rdquo;. The above will also take long to get the pods into a healthy state since zookeeper must negotiate consensus during its leader election phase. I also found it hard to read.</span></p>
         </div>
         <div class="card">
             <h2>Set the Zookeeper myid file declaratively</h2>
             <h5>A more declarative appraoch, December 4, 2022</h5>
             <img src="{{url_for('static', filename='declarative.png')}}" style="height:200px;">
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">The problem:&nbsp;</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">In one of my projects, I had to containerize a monolithic Application into micro services. Obviously, I faced many challenges. But for this blog I will discuss the challenge I faced with an ensemble of 3 zookeepers on Virtual Machines that needed to run on containers.</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">Like everyone else I started by going over the Kubernetes documentation and fortunately I found an example that is specifically written for zookeepers. So, I first thought, wow finally; most of the work is already done&nbsp;</span><span style="font-size:19px;font-family:Wingdings;"></span><span style="font-size:19px;font-family:Consolas;">.</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">However, I found that the provided solution from the Kubernetes example and documentation to populate zookeepers <span style="color:#2F5597;">myid</span> file was causing issues each time that I deploy an update to the zookeeper ensemble on Kubernetes.&nbsp;</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">Notably, the StatefulSet pvc (persistent volume claim) may have had a previous id of 1 and will now use id 2 after deployment since the pvc will mount to a random new pod that gets scheduled to start. which in turn lead to the SOLR cluster to lose data and also entire collections!!</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">Here is the example two-part snippet from <a href="https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/">zookeeper on kubernetes.io</a>.</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style='font-family:"Courier New";'>&nbsp;</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;background:#E7E6E6;'><span style='font-size:19px;font-family:"Courier New";color:black;'>for i in 0 1 2;<br>&nbsp; &nbsp;do echo &quot;myid zk-$i&quot;;<br>&nbsp; &nbsp; &nbsp; kubectl exec zk-$i -- cat /var/lib/zookeeper/data/myid;<br>&nbsp; &nbsp;done</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style='font-family:"Courier New";'>&nbsp;</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style='font-family:"Courier New";'>&nbsp;</span></p>
-            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><span style="font-size:19px;font-family:Consolas;">As you can see, the snippet above also depends on having the binary for kubectl installed. Which I wanted to avoid since; I try to follow the principle of &ldquo;less is more&rdquo;. The above will also take long to get the pods into a healthy state since zookeeper must negotiate consensus during its leader election phase. I also found it hard to read.</span></p>
         </div>
     </div>
     <div class="rightcolumn">
