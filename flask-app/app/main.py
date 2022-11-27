@@ -33,6 +33,11 @@ def index():
 def blog1():
     return render_template('extra-html/blog1.html')
 
+## BLOG 2 ##
+@app.route('/extra-html/blog2.html')
+def blog1():
+    return render_template('extra-html/blog2.html')
+
 @app.route("/clicknext")
 def home():
     captured = {
