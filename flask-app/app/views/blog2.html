@@ -1,46 +1,46 @@
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;"><strong>The Solution:&nbsp;</strong></span></p>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">Here is the simplification that I implemented instead of using the aforementioned for loop:</span></p>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">I knew that if I can get the file &ldquo;myid&rdquo; on the zookeepers to be more declarative, that would solve my issues and it will also make the operation more readable. I noticed that the StatefulSet deployment gives the zookeepers a name following a pattern as shown here.</span></p>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
-<pre style='margin:0in;margin-bottom:.0001pt;font-size:13px;font-family:"Courier New";background:#F8F9FA;'><code style='font-family:"Courier New";'><span style="font-size:19px;font-family:Consolas;color:#222222;border:none windowtext 1.0pt;padding:0in;">zk-0</span></code></pre>
-<pre style='margin:0in;margin-bottom:.0001pt;font-size:13px;font-family:"Courier New";background:#F8F9FA;'><code style='font-family:"Courier New";'><span style="font-size:19px;font-family:Consolas;color:#222222;border:none windowtext 1.0pt;padding:0in;">zk-1</span></code></pre>
-<pre style='margin:0in;margin-bottom:.0001pt;font-size:13px;font-family:"Courier New";background:#F8F9FA;'><code style='font-family:"Courier New";'><span style="font-size:19px;font-family:Consolas;color:#222222;border:none windowtext 1.0pt;padding:0in;">zk-2</span></code></pre>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">My instinct was, what if I could get that HOSTNAME from the pod itself and add a 1 to it?&nbsp;</span></p>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">So, it should look like this for example: zk-0 + 1 = zk-1, then I will take the result integer and add that to <span style="color:#2F5597;">myid</span> file.</span></p>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">&nbsp;</span></p>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">But how do you get hostname from a container running in Kubernetes? Well, as it turned out, no need to. Because I defaulted to use bash inside the pod itself, and I came up with this one-liner:</span></p>
-<p style='margin:0in;font-size:16px;'><span style='font-family:"Courier New";'>&nbsp;</span></p>
-<pre style='margin:0in;margin-bottom:.0001pt;font-size:13px;font-family:"Courier New";background:#D9D9D9;'><span style="font-size:19px;color:black;">echo $((${HOSTNAME##*-}+1)) &gt; /var/lib/zookeeper/data/myid</span></pre>
-<p style='margin:0in;font-size:16px;'><span style='font-family:"Courier New";'>&nbsp;</span></p>
-<p style='margin:0in;font-size:16px;'><span style="font-size:19px;font-family:Consolas;">Now you can have a more declarative and consistent zookeeper election process since the deployment reattachment to pvc will now always reattach the corresponding id as shown in this table.</span></p>
-<p style='margin:0in;font-size:16px;'><span style='font-family:"Courier New";'>&nbsp;</span></p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'><strong>The Solution:</strong></p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>&nbsp;</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>Here is the simplification that I implemented instead of using the aforementioned for loop:</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>&nbsp;</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>I knew that if I can get the file &ldquo;myid&rdquo; on the zookeepers to be more declarative it would solve my issues and it will also make the operation more readable. I noticed that the StatefulSet deployment gives the zookeepers a name following a pattern as shown here:</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>&nbsp;</p>
+<pre style='margin:0in;margin-bottom:.0001pt;font-size:13px;font-family:"Courier New";background:#F8F9FA;'><code style='font-family:"Courier New";'><span style="font-size:14px;font-family:Menlo;color:#222222;border:none windowtext 1.0pt;padding:0in;">zk-0</span></code></pre>
+<pre style='margin:0in;margin-bottom:.0001pt;font-size:13px;font-family:"Courier New";background:#F8F9FA;'><code style='font-family:"Courier New";'><span style="font-size:14px;font-family:Menlo;color:#222222;border:none windowtext 1.0pt;padding:0in;">zk-1</span></code></pre>
+<pre style='margin:0in;margin-bottom:.0001pt;font-size:13px;font-family:"Courier New";background:#F8F9FA;'><code style='font-family:"Courier New";'><span style="font-size:14px;font-family:Menlo;color:#222222;border:none windowtext 1.0pt;padding:0in;">zk-2</span></code></pre>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>&nbsp;</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>My intuition was I could get that HOSTNAME from the pod itself and add a 1 to it.</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>So, it should look like this for example: zk-0 + 1 = zk-1, then I will take the result integer and add that to <span style="color:#2F5496;">myid</span> file.</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>&nbsp;</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>But how do you get hostname from a container running in Kubernetes? Well, as it turned out, there was no need because I defaulted to use bash inside the pod itself, and I came up with this one-liner:</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>&nbsp;</p>
+<pre style='margin:0in;margin-bottom:.0001pt;font-size:13px;font-family:"Courier New";background:#2B2B2B;'><span style="color:#C57633;">echo </span><span style="color:#CC7832;">$</span><span style="color:#A9B7C6;">((</span><span style="color:#CC7832;">$</span><span style="color:#A9B7C6;">{HOSTNAME##*-}+</span><span style="color:#6897BB;">1</span><span style="color:#A9B7C6;">)) </span><span style="color:#CC7832;">&gt; </span><span style="color:#A9B7C6;">/var/lib/zookeeper/data/</span><span style="color:#2F5496;">myid</span></pre>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>&nbsp;</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>Now, you can have a more declarative and consistent zookeeper election process since the deployment reattachment to pvc will now always reattach the corresponding id as shown in this table:</p>
+<p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>&nbsp;</p>
 <table style="border-collapse:collapse;border:none;">
     <tbody>
     <tr>
         <td style="width: 233.75pt;border: 1pt solid windowtext;padding: 0in 5.4pt;vertical-align: top;">
-            <p style='margin:0in;font-size:16px;'><strong><span style='font-size:19px;font-family:"Courier New";'>zk-0</span></strong></p>
+            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>zk-0</p>
         </td>
         <td style="width: 233.75pt;border-top: 1pt solid windowtext;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-image: initial;border-left: none;padding: 0in 5.4pt;vertical-align: top;">
-            <p style='margin:0in;font-size:16px;'><strong><span style='font-size:19px;font-family:"Courier New";'>myid 1</span></strong></p>
+            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>myid 1</p>
         </td>
     </tr>
     <tr>
         <td style="width: 233.75pt;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-left: 1pt solid windowtext;border-image: initial;border-top: none;padding: 0in 5.4pt;vertical-align: top;">
-            <p style='margin:0in;font-size:16px;'><strong><span style='font-size:19px;font-family:"Courier New";'>zk-1</span></strong></p>
+            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>zk-1</p>
         </td>
         <td style="width: 233.75pt;border-top: none;border-left: none;border-bottom: 1pt solid windowtext;border-right: 1pt solid windowtext;padding: 0in 5.4pt;vertical-align: top;">
-            <p style='margin:0in;font-size:16px;'><strong><span style='font-size:19px;font-family:"Courier New";'>myid 2</span></strong></p>
+            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>myid 2</p>
         </td>
     </tr>
     <tr>
         <td style="width: 233.75pt;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-left: 1pt solid windowtext;border-image: initial;border-top: none;padding: 0in 5.4pt;vertical-align: top;">
-            <p style='margin:0in;font-size:16px;'><strong><span style='font-size:19px;font-family:"Courier New";'>zk-2</span></strong></p>
+            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>zk-2</p>
         </td>
         <td style="width: 233.75pt;border-top: none;border-left: none;border-bottom: 1pt solid windowtext;border-right: 1pt solid windowtext;padding: 0in 5.4pt;vertical-align: top;">
-            <p style='margin:0in;font-size:16px;'><strong><span style='font-size:19px;font-family:"Courier New";'>myid 3</span></strong></p>
+            <p style='margin:0in;font-size:16px;font-family:"Times New Roman",serif;'>myid 3</p>
         </td>
     </tr>
     </tbody>
