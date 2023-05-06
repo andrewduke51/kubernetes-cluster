@@ -33,8 +33,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
 </head>
-   <meta charset="utf-8">
-   <title>Run ZK on Kubernetes - DEV  💻👩‍💻👨‍💻💻 </title>
+<meta charset="utf-8">
+<title>Run ZK on Kubernetes - DEV  💻👩‍💻👨‍💻💻 </title>
 <style>
     code {
         font-family: font-family:"Times New Roman",serif;
@@ -51,23 +51,27 @@
     <div class="leftcolumn">
         <div class="card">
             <h2>Zookeeper deployed on Kubernetes</h2>
-            <h5>The recommended version from <a href="https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/">link</a> , Dec 4, 2022</h5>
+            <h5>The recommended version from <a href="https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/">link</a>, Dec 4, 2022</h5>
             <img src="{{url_for('static', filename='kpluszk.jpeg')}}" style="height:200px;width:600px">
             <div w3-include-html="blog1.html"></div>
         </div>
         <div class="card">
             <h2>Set the Zookeeper myid file declaratively</h2>
-            <h5>A more declarative appraoch, December 4, 2022</h5>
+            <h5>A more declarative approach, December 4, 2022</h5>
             <img src="{{url_for('static', filename='im_vs_decl.jpeg')}}" style="height:300px;width:500px;">
             <div w3-include-html="blog2.html"></div>
         </div>
+        <div style="margin-bottom: 20px;"></div> <!-- Double space -->
+
+        <!-- Include conclusion.html -->
+        <div w3-include-html="conclusion.html"></div>
     </div>
     <div class="rightcolumn">
         <div class="card">
             <h2>About Me</h2>
             <img src="{{url_for('static', filename='abountme.jpeg')}}" style="height:200px;">
             <div class="color-base-70">
-            I am Andrew, and earlier in my life I wanted to become a chef. Currently, I am a self-taught DevOps Practitioner and Docker Composer 😃.
+                I am Andrew, and earlier in my life I wanted to be a chef. Currently, I am a self-taught DevOps Practitioner and Docker Composer 😃.
                 - Everything is challenging before you start doing it  🚀 🤖 💻.
             </div>
         </div>
@@ -95,3 +99,4 @@
 <script>
     includeHTML();
 </script>
+</html>
