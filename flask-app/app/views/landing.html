@@ -33,11 +33,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
 </head>
-<meta charset="utf-8">
-<title>Run ZK on Kubernetes - DEV  💻👩‍💻👨‍💻💻 </title>
+   <meta charset="utf-8">
+   <title>Run ZK on Kubernetes - DEV  💻👩‍💻👨‍💻💻 </title>
 <style>
     code {
-        font-family: "Times New Roman", serif;
+        font-family: font-family:"Times New Roman",serif;
         color: #1a43c2;
         background-color: #f1f1f1;
         padding: 2px;
@@ -51,19 +51,15 @@
     <div class="leftcolumn">
         <div class="card">
             <h2>Zookeeper deployed on Kubernetes</h2>
-            <h5>The recommended version from <a href="https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/">link</a>, Dec 4, 2022</h5>
+            <h5>The recommended version from <a href="https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/">link</a> , Dec 4, 2022</h5>
             <img src="{{url_for('static', filename='kpluszk.jpeg')}}" style="height:200px;width:600px">
             <div w3-include-html="blog1.html"></div>
         </div>
         <div class="card">
             <h2>Set the Zookeeper myid file declaratively</h2>
-            <h5>A more declarative approach, December 4, 2022</h5>
+            <h5>A more declarative appraoch, December 4, 2022</h5>
             <img src="{{url_for('static', filename='im_vs_decl.jpeg')}}" style="height:300px;width:500px;">
             <div w3-include-html="blog2.html"></div>
-        </div>
-        <div class="card">
-            <h2>Conclusion</h2>
-            <p>Your conclusion content here...</p>
         </div>
     </div>
     <div class="rightcolumn">
@@ -71,15 +67,31 @@
             <h2>About Me</h2>
             <img src="{{url_for('static', filename='abountme.jpeg')}}" style="height:200px;">
             <div class="color-base-70">
-                I am Andrew, and earlier in my life, I wanted to become a chef. Currently, I am a self-taught DevOps Practitioner and Docker Composer 😃.
-                - Everything is challenging before you start doing it 🚀 🤖 💻.
+            I am Andrew, and earlier in my life I wanted to become a chef. Currently, I am a self-taught DevOps Practitioner and Docker Composer 😃.
+                - Everything is challenging before you start doing it  🚀 🤖 💻.
             </div>
         </div>
         <div class="card">
             <h3>Popular Posts</h3>
-            <blockquote class="embedly-card">
-                <h4><a href="https://dev.to/techworld_with_nana/run-pod-with-root-privileges-41n9">Run Kubernetes Pod with root privileges (not recommended)</a></h4>
-                <p>Most Docker containers and the processes inside run with a non-root user because of better security. If the container process is running with root (uid 0), it will be the same root as on the host. In this case, the user may get access to the host from the container, thus gaining root privilege on the host.</p>
-            </blockquote>
-            <script async
+            <blockquote class="embedly-card"><h4><a href="https://dev.to/techworld_with_nana/run-pod-with-root-privileges-41n9">Run Kubernetes Pod with root privileges (not recommended)</a></h4><p>Most Docker containers and the processes inside run with non-root user, because of better security. If the container process is running with root (uid 0) it will be the same root as on the host. In this case user may get access to host from the container, thus gaining the root privilege on the host.</p></blockquote>
+            <script async src="//cdn.embedly.com/widgets/platform.js" charset="UTF-8"></script>
 
+            <blockquote class="embedly-card"><h4><a href="https://medium.com/@keska.damian/architectural-pyramid-of-tekton-a-cloud-native-modular-ci-cd-99147d5e1f28">Tekton's Architecture Pyramid, cloud-native, modular CI/CD building blocks</a></h4><p>Have you ever been looking for a Jenkins alternative? Do you like Kubernetes? I will show you the architecture of Tekton Pipelines and Tekton Triggers, which are the most popular components for building cloud-native CI/CD on top of Kubernetes.</p></blockquote>
+            <script async src="//cdn.embedly.com/widgets/platform.js" charset="UTF-8"></script>
+
+            <blockquote class="embedly-card"><h4><a href="https://medium.com/devops-mojo/kubernetes-k8s-overview-what-is-kubernetes-why-kubernetes-introduction-to-kubernetes-da92ee11c8fb">Kubernetes (K8s) Overview</a></h4><p>What is Kubernetes - Introduction to Kubernetes (K8s) Orchestration Kubernetes is a portable, extensible, open-source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation.</p></blockquote>
+            <script async src="//cdn.embedly.com/widgets/platform.js" charset="UTF-8"></script>
+        </div>
+        <div class="card">
+            <h3>Follow me on Twitter</h3>
+            <p><a href="https://twitter.com/andrewduke51">My Twitter Handle <a href="https://emoji.gg/emoji/3421_Twitter"><img src="https://cdn3.emoji.gg/emojis/3421_Twitter.png" width="20px" height="20px" alt="Twitter"></a></a></p>
+        </div>
+    </div>
+</div>
+<footer>
+    <p>Author: Andrewduke51</p>
+    &copy; Copyright 2022
+</footer>
+<script>
+    includeHTML();
+</script>
