@@ -15,7 +15,7 @@ jobs:
           command: |
             chmod +x ops/*sh
             ops/env.sh ${SOMEVAR}
-            #ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
+            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
             ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
       - run:
           name: Build Docker Container with Flask App
