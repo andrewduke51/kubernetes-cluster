@@ -49,7 +49,7 @@ def home():
         counter.value += 1
     data = counter.value
     ip_addr = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
-    return render_template('home.html',
+    return render_template('clicknext.html',
                            title="page",
                            json_value=json.dumps(data),
                            ip_addr=ip_addr,
