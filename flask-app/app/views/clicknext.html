@@ -10,18 +10,17 @@
             integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
             crossorigin="anonymous"
     />
-
 </head>
-<center><h1>I am collecting IP addresses!</h1><center>
-</h1><center>Your IP address is: {{ip_addr}} - Thanks </h1><center>
-    <h3>Hello visitor!</h3>
 <body>
-<i><center><font size="+2">You are Visitor Number:</font><font size="+2"><div class="container"></div></font><center></i>
+<center><h1>I am collecting IP addresses!</h1></center>
+<center>Your IP address is: {{ip_addr}} - Thanks</center>
+<h3>Hello visitor!</h3>
+<i><center><font size="+2">You are Visitor Number:</font><font size="+2"><div class="container">{{total_visitors}}</div></font></center></i>
 <script>
     const json_value = JSON.parse({{json_value|tojson}});
     console.log(json_value);
     document.querySelector(".container").innerHTML = JSON.stringify(json_value, null, 2);
 </script>
-    <center><a href="/proxy_client"><input type="button" value="Click to download resume" style="font-size : 16px; width: 25%; height: 60px; background-color: #90EE90;" /></a><center>
+<center><a href="/proxy_client"><input type="button" value="Click to download resume" style="font-size : 16px; width: 25%; height: 60px; background-color: #90EE90;" /></a></center>
 </body>
 </html>
