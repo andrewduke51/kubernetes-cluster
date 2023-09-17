@@ -4,17 +4,13 @@ import pymongo
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
-ipcollection = visitorsdb["visitors"]
-attackcollection = visitorsdb["attacks"]
-
 # Create a Blueprint for the admin route
 admin_bp = Blueprint("admin_bp", __name__)
 
 # Define the IP collection variable here
 mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
-ipcollection = visitorsdb["visitors"]
+attackcollection = visitorsdb["attacks"]
 
 # Create a limiter instance with a rate limit of 3 attempts per minute for login
 limiter = Limiter(
