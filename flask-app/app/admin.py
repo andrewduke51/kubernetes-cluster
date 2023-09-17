@@ -4,8 +4,7 @@ from datetime import datetime
 import pymongo
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from main import limiter
-from shared import redis_server
+from shared import limiter, redis_server
 
 # Create a Blueprint for the admin route
 admin_bp = Blueprint("admin_bp", __name__)

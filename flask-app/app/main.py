@@ -6,8 +6,6 @@ import os
 from flask import Flask
 from clicknext import clicknext_bp
 from admin import admin_bp
-import redislite
-from shared import limiter
 
 # Variables
 app = Flask(__name__, template_folder='views')
