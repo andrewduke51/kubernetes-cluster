@@ -1,9 +1,10 @@
+# admin.py
 from flask import Blueprint, render_template, request, jsonify
 from datetime import datetime
 import pymongo
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from redis_utils import redis_server  # Import redis_server from your redis_utils module
+from shared import redis_server
 
 # Create a Blueprint for the admin route
 admin_bp = Blueprint("admin_bp", __name__)
@@ -29,7 +30,6 @@ def custom_rate_limit():
     if attempts is not None and attempts >= 3:
         return False  # Limit exceeded, deny the request
     return True  # Limit not exceeded, allow the request
-
 
 # Apply the limiter to the admin Blueprint
 limiter.limit(custom_rate_limit)(admin_bp)

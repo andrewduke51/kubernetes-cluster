@@ -4,10 +4,13 @@ from datetime import datetime
 import pymongo
 import os
 from flask import Flask
-from admin import admin_bp
 from clicknext import clicknext_bp
+from admin import admin_bp
+import redislite
 
-# Variables ##
+redis_server = redislite.StrictRedis()
+
+# Variables
 app = Flask(__name__, template_folder='views')
 counter = Value('i', 0)
 mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
@@ -22,10 +25,10 @@ def not_found(e):
 @app.route('/', methods=["GET"])
 def index():
     captured = {
-        "time_stamp" : datetime.now().strftime("%m/%d/%y - %H:%M:%S"),
-        "ip_addresses" : request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+        "time_stamp": datetime.now().strftime("%m/%d/%y - %H:%M:%S"),
+        "ip_addresses": request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
     }
-    #ipcollection.insert_one(captured)          << DO not use for now
+    # ipcollection.insert_one(captured) << DO not use for now
     return render_template('landing.html')
 
 ## BLOG 1 ##
@@ -48,7 +51,9 @@ app.register_blueprint(admin_bp)
 def proxy_client():
     return render_template('proxy_client.html')
 
+redis_server = redislite.StrictRedis()
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=True, host='0.0.0.0', port=port)
+
