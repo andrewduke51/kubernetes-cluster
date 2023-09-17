@@ -1,6 +1,13 @@
 from flask import Blueprint, render_template, request
 from datetime import datetime
 
+
+# Variables ##
+app = Flask(__name__, template_folder='views')
+mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
+visitorsdb = mongoconnection["ips"]
+attackcollection = visitorsdb["attacks"]
+
 # Create a Blueprint for the admin routes
 admin_bp = Blueprint("admin_bp", __name__)
 
