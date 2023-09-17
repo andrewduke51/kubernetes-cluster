@@ -12,40 +12,33 @@ mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
 attackcollection = visitorsdb["attacks"]
 
-# Create a limiter instance with a rate limit of 3 attempts per minute for login
-limiter = Limiter(
-    key_func=get_remote_address,
-    storage_uri="memory://",  # You can choose a different storage option
-    default_limits=["3 per minute"]
-)
+
+# Create a Blueprint for the admin route
+admin_bp = Blueprint("admin_bp", __name__)
 
 # Counter to track login attempts
 login_attempts = {}
 
-
 @admin_bp.route('/admin', methods=["GET", "POST"])
 @admin_bp.route('/config', methods=["GET", "POST"])
-@limiter.request_filter
 def honeypot():
     # Check if the subpath matches "/admin"
     if request.method == "POST":
-        # Check login credentials here (you can implement your logic)
+        # Increment the login attempt count for this IP
+        remote_address = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+        login_attempts[remote_address] = login_attempts.get(remote_address, 0) + 1
+
+        # Check if the login attempts exceed the limit (3 attempts)
+        if login_attempts[remote_address] >= 3:
+            return "Oops! You stumbled into our honeypot. No secrets for you! 😄"
+
+        # Replace this with your actual login validation logic
         username = request.form.get("username")
         password = request.form.get("password")
 
-        # Replace this with your actual login validation logic
-        valid_credentials = validate_login(username, password)
-
-        if valid_credentials:
+        # For demonstration purposes, let's assume a valid login is "admin" with any password
+        if username == "admin":
             return render_template('admin.html')
-        else:
-            # Increment the login attempt count for this IP
-            remote_address = get_remote_address()
-            login_attempts[remote_address] = login_attempts.get(remote_address, 0) + 1
-
-            # Check if the login attempts exceed the limit (3 attempts)
-            if login_attempts[remote_address] >= 3:
-                return "Oops! You stumbled into our honeypot. No secrets for you! 😄"
 
     # Log and save attack details to the "attacks" collection
     captured = {
