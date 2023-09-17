@@ -2,10 +2,9 @@ from flask import Flask, render_template, jsonify, request
 from multiprocessing import Value
 from datetime import datetime
 import pymongo
-import socket
-import json
 import os
 from admin import admin_bp
+from clicknext import clicknext_bp
 
 # Variables ##
 app = Flask(__name__, template_folder='views')
@@ -38,22 +37,8 @@ def blog1():
 def blog2():
     return render_template('blog2.html')
 
-@app.route("/clicknext")
-def home():
-    captured = {
-        "time_stamp": datetime.now(),
-        "ip_addresses": request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
-    }
-    ipcollection.insert_one(captured)
-    # Retrieve the current visitor count from the database
-    total_visitors = ipcollection.count_documents({})
-    ip_addr = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
-    return render_template('clicknext.html',
-                           title="page",
-                           json_value=json.dumps(total_visitors),
-                           ip_addr=ip_addr,
-                           hostname=socket.gethostname()
-                           )
+# Register the clicknext blueprint with the app
+app.register_blueprint(clicknext_bp)
 
 # Register the admin blueprint with the app
 app.register_blueprint(admin_bp)

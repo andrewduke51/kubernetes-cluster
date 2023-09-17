@@ -1,13 +1,21 @@
+# clicknext.py
 
+from flask import Blueprint, render_template, request, jsonify
+from datetime import datetime
+import pymongo
+import socket
+import json
 
-# Variables ##
-app = Flask(__name__, template_folder='views')
-counter = Value('i', 0)
+# Create a Blueprint for the clicknext route
+clicknext_bp = Blueprint("clicknext_bp", __name__)
+
+# Define the IP collection variable here
 mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
 ipcollection = visitorsdb["visitors"]
 
-@app.route("/clicknext")
+# /clicknext route
+@clicknext_bp.route("/clicknext")
 def home():
     captured = {
         "time_stamp": datetime.now(),
