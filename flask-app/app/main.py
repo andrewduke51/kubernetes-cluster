@@ -55,7 +55,7 @@ def home():
                            )
 
 @app.route('/admin', methods=["GET", "POST"])
-@app.route('/config', methods=["GET", "POST"])
+@app.route('/<path:subpath>', methods=["GET", "POST"])
 def honeypot():
     # Log and save attack details to the "attacks" collection
     captured = {
@@ -69,7 +69,7 @@ def honeypot():
         }
     }
     attackcollection.insert_one(captured)  # Use a separate collection for attacks
-    return "Access Denied: This is a honeypot route."
+    return render_template('admin.html')
 
 @app.route('/proxy_client')
 def proxy_client():
