@@ -12,20 +12,30 @@ mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
 attackcollection = visitorsdb["attacks"]
 
-# Create a limiter instance with a rate limit of 3 attempts per minute for login
+# Create a limiter instance with a custom rate limit function
 limiter = Limiter(
     key_func=get_remote_address,
     storage_uri="redis://localhost:6379/0"  # Use Redis for storage
 )
-# Define the rate limit: 3 requests per minute
-limiter.limit("3 per minute")(admin_bp)
+
+# Define a custom rate limit function that allows 3 tries per minute
+@limiter.request_filter
+def custom_rate_limit():
+    remote_address = get_remote_address()
+    attempts = limiter.limiter.get(remote_address)
+    if attempts is not None and attempts >= 3:
+        return False  # Limit exceeded, deny the request
+    return True  # Limit not exceeded, allow the request
+
+# Apply the limiter to the admin Blueprint
+limiter.limit(custom_rate_limit)(admin_bp)
 
 @admin_bp.route('/admin', methods=["GET", "POST"])
 @admin_bp.route('/config', methods=["GET", "POST"])
 def honeypot():
     if request.method == "POST":
         # Check if the login attempts exceed the limit (3 attempts)
-        if request.endpoint in ["admin_bp.honeypot", "admin_bp.config"]:
+        if not custom_rate_limit():
             return "Oops! You stumbled into our honeypot. No secrets for you! 😄"
 
         # Log and save attack details to the "attacks" collection
