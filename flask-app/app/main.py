@@ -4,13 +4,10 @@ from datetime import datetime
 import pymongo
 import os
 from flask import Flask
-from flask_limiter import Limiter
 from clicknext import clicknext_bp
 from admin import admin_bp
 import redislite
-
-limiter = Limiter(app, key_func=get_remote_address)
-redis_server = redislite.StrictRedis()
+from shared import limiter
 
 # Variables
 app = Flask(__name__, template_folder='views')
@@ -53,9 +50,6 @@ app.register_blueprint(admin_bp)
 def proxy_client():
     return render_template('proxy_client.html')
 
-redis_server = redislite.StrictRedis()
-
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=True, host='0.0.0.0', port=port)
-
