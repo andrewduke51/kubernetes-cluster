@@ -24,7 +24,7 @@ def index():
         "time_stamp" : datetime.now().strftime("%m/%d/%y - %H:%M:%S"),
         "ip_addresses" : request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
     }
-    ipcollection.insert_one(captured)
+    #ipcollection.insert_one(captured)          << DO not use for now
     return render_template('landing.html')
 
 ## BLOG 1 ##
