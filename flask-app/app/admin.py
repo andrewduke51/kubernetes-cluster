@@ -20,12 +20,12 @@ limiter = Limiter(
 # Define the rate limit: 3 requests per minute
 limiter.limit("3 per minute")(admin_bp)
 
-@login_bp.route('/admin', methods=["GET", "POST"])
-@login_bp.route('/config', methods=["GET", "POST"])
+@admin_bp.route('/admin', methods=["GET", "POST"])
+@admin_bp.route('/config', methods=["GET", "POST"])
 def honeypot():
     if request.method == "POST":
         # Check if the login attempts exceed the limit (3 attempts)
-        if request.endpoint in ["admin_bp.admin", "admin_bp.config"]:
+        if request.endpoint in ["admin_bp.honeypot", "admin_bp.config"]:
             return "Oops! You stumbled into our honeypot. No secrets for you! 😄"
 
         # Log and save attack details to the "attacks" collection
