@@ -1,10 +1,9 @@
 from flask import Blueprint, render_template, request, jsonify
 from datetime import datetime
 import pymongo
-import socket
-import json
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from main import attackcollection
 
 # Create a Blueprint for the admin route
 admin_bp = Blueprint("admin_bp", __name__)
