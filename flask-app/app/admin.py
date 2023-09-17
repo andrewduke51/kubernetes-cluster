@@ -8,6 +8,9 @@ import redislite
 # Create a Blueprint for the admin route
 admin_bp = Blueprint("admin_bp", __name__)
 
+redis_server = redislite.Redis()
+redis_server.flushdb()
+
 # Define the IP collection variable here
 mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
