@@ -9,5 +9,5 @@ Werkzeug==2.0.2
 gunicorn==20.1.0
 redis==4.3.4
 slack_sdk==3.21.3
-flask-limiter==3.5.0
+flask-limiter==1.4
 redislite==6.2.859089
