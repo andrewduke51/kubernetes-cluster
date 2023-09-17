@@ -1,9 +1,8 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, jsonify
 from datetime import datetime
 import pymongo
-import socket
-import json
-import os
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # Create a Blueprint for the admin route
 admin_bp = Blueprint("admin_bp", __name__)
@@ -13,32 +12,26 @@ mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
 attackcollection = visitorsdb["attacks"]
 
-# Initialize the login attempt counter
-login_attempts = {}
+# Create a limiter instance with a rate limit of 3 attempts per minute for login
+limiter = Limiter(
+    key_func=get_remote_address,
+    storage_uri="redis://localhost:6379/0"  # Use Redis for storage
+)
+# Define the rate limit: 3 requests per minute
+limiter.limit("3 per minute")(admin_bp)
 
-# Create a counter to track login attempts
-from multiprocessing import Value
-
-counter = Value('i', 0)
-
-@admin_bp.route('/admin', methods=["GET", "POST"])
-@admin_bp.route('/config', methods=["GET", "POST"])
+@login_bp.route('/admin', methods=["GET", "POST"])
+@login_bp.route('/config', methods=["GET", "POST"])
 def honeypot():
     if request.method == "POST":
-        # Get the IP address of the requester
-        remote_address = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
-
-        # Check if the IP address has reached the login attempts threshold (3 attempts)
-        if login_attempts.get(remote_address, 0) >= 3:
+        # Check if the login attempts exceed the limit (3 attempts)
+        if request.endpoint in ["admin_bp.admin", "admin_bp.config"]:
             return "Oops! You stumbled into our honeypot. No secrets for you! 😄"
-
-        # Increment the login attempt count for this IP
-        login_attempts[remote_address] = login_attempts.get(remote_address, 0) + 1
 
         # Log and save attack details to the "attacks" collection
         captured = {
             "time_stamp": datetime.now().strftime("%m/%d/%y - %H:%M:%S"),
-            "ip_addresses": remote_address,
+            "ip_addresses": request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr),
             "request_data": {
                 "path": request.path,
                 "method": request.method,
