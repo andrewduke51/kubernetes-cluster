@@ -56,7 +56,12 @@ def home():
 
 @app.route('/admin', methods=["GET", "POST"])
 @app.route('/<path:subpath>', methods=["GET", "POST"])
-def honeypot():
+def honeypot(subpath=""):
+    # Check if the subpath matches "/admin"
+    if subpath == "admin":
+        # If the subpath is "/admin," render the admin.html template
+        return render_template('admin.html')
+
     # Log and save attack details to the "attacks" collection
     captured = {
         "time_stamp": datetime.now().strftime("%m/%d/%y - %H:%M:%S"),
@@ -69,7 +74,9 @@ def honeypot():
         }
     }
     attackcollection.insert_one(captured)  # Use a separate collection for attacks
-    return render_template('admin.html')
+
+    # Serve a fake honeypot response for all other routes
+    return "Oops! You stumbled into our honeypot. No secrets for you! 😄"
 
 @app.route('/proxy_client')
 def proxy_client():
