@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request
 from datetime import datetime
 import pymongo
 from flask_limiter import Limiter
@@ -12,33 +12,29 @@ mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
 attackcollection = visitorsdb["attacks"]
 
-
-# Create a Blueprint for the admin route
-admin_bp = Blueprint("admin_bp", __name__)
+# Create a limiter instance with a rate limit of 3 attempts per minute for login
+limiter = Limiter(
+    key_func=get_remote_address,
+    storage_uri="memory://",  # You can choose a different storage option
+    default_limits=["3 per minute"]
+)
 
 # Counter to track login attempts
 login_attempts = {}
 
 @admin_bp.route('/admin', methods=["GET", "POST"])
 @admin_bp.route('/config', methods=["GET", "POST"])
+@limiter.request_filter
 def honeypot():
     # Check if the subpath matches "/admin"
     if request.method == "POST":
         # Increment the login attempt count for this IP
-        remote_address = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+        remote_address = get_remote_address()
         login_attempts[remote_address] = login_attempts.get(remote_address, 0) + 1
 
         # Check if the login attempts exceed the limit (3 attempts)
         if login_attempts[remote_address] >= 3:
             return "Oops! You stumbled into our honeypot. No secrets for you! 😄"
-
-        # Replace this with your actual login validation logic
-        username = request.form.get("username")
-        password = request.form.get("password")
-
-        # For demonstration purposes, let's assume a valid login is "admin" with any password
-        if username == "admin":
-            return render_template('admin.html')
 
     # Log and save attack details to the "attacks" collection
     captured = {
