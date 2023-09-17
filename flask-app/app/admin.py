@@ -1,9 +1,20 @@
-from flask import Blueprint, render_template, request
+from flask import Flask, render_template, request, Blueprint
 from datetime import datetime
-
+import pymongo
+import socket
+import json
+import os
 
 # Create a Blueprint for the admin routes
 admin_bp = Blueprint("admin_bp", __name__)
+
+# Define the attackcollection variable here
+mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
+visitorsdb = mongoconnection["ips"]
+ipcollection = visitorsdb["visitors"]
+attackcollection = visitorsdb["attacks"]
+
+# ... (Other imports and variables)
 
 # Routes for /admin and /config
 @admin_bp.route('/admin', methods=["GET", "POST"])
