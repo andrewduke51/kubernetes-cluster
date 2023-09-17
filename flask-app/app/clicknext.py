@@ -1,5 +1,12 @@
 
 
+# Variables ##
+app = Flask(__name__, template_folder='views')
+counter = Value('i', 0)
+mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
+visitorsdb = mongoconnection["ips"]
+ipcollection = visitorsdb["visitors"]
+
 @app.route("/clicknext")
 def home():
     captured = {
