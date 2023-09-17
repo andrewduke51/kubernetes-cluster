@@ -14,7 +14,7 @@ visitorsdb = mongoconnection["ips"]
 attackcollection = visitorsdb["attacks"]
 
 # Create an in-memory Redis server using redislite
-redis_server = redislite.StrictRedis().server  # Create an in-memory Redis server
+redis_server = redislite.Redis(serverconfig={'unixsocket': True})
 
 # Create a Limiter instance with a custom rate limit function
 limiter = Limiter(
