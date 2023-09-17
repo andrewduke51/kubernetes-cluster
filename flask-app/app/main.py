@@ -5,6 +5,7 @@ import pymongo
 import socket
 import json
 import os
+from admin import admin_bp
 
 # Variables ##
 app = Flask(__name__, template_folder='views')
@@ -54,22 +55,8 @@ def home():
                            hostname=socket.gethostname()
                            )
 
-@app.route('/admin', methods=["GET", "POST"])
-@app.route('/config', methods=["GET", "POST"])
-def honeypot():
-    # Log and save attack details to the "attacks" collection
-    captured = {
-        "time_stamp": datetime.now().strftime("%m/%d/%y - %H:%M:%S"),
-        "ip_addresses": request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr),
-        "request_data": {
-            "path": request.path,
-            "method": request.method,
-            "user_agent": request.user_agent.string,
-            "data": request.get_data(as_text=True),
-        }
-    }
-    attackcollection.insert_one(captured)  # Use a separate collection for attacks
-    return render_template('admin.html')
+# Register the admin blueprint with the app
+app.register_blueprint(admin_bp)
 
 @app.route('/proxy_client')
 def proxy_client():
