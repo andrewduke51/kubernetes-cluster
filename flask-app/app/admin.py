@@ -3,6 +3,7 @@ from datetime import datetime
 import pymongo
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import redislite  # Import redislite
 
 # Create a Blueprint for the admin route
 admin_bp = Blueprint("admin_bp", __name__)
@@ -12,10 +13,13 @@ mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
 attackcollection = visitorsdb["attacks"]
 
-# Create a limiter instance with a custom rate limit function
+# Create an in-memory Redis server using redislite
+redis_server = redislite.StrictRedis().server  # Create an in-memory Redis server
+
+# Create a Limiter instance with a custom rate limit function
 limiter = Limiter(
     key_func=get_remote_address,
-    storage_uri="redis://localhost:6379/0"  # Use Redis for storage
+    storage_uri=redis_server.uri  # Use the in-memory Redis server for storage
 )
 
 # Define a custom rate limit function that allows 3 tries per minute
