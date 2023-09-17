@@ -19,7 +19,7 @@ redis_server = redislite.Redis()
 # Create a Limiter instance with a custom rate limit function
 limiter = Limiter(
     key_func=get_remote_address,
-    storage_uri=redis_server  # Use the in-memory Redis server for storage
+    storage_uri="redis://localhost:6379/0"  # Use the in-memory Redis server for storage
 )
 
 # Define a custom rate limit function that allows 3 tries per minute
