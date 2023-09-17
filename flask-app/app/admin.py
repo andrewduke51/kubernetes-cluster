@@ -15,8 +15,6 @@ attackcollection = visitorsdb["attacks"]
 # Counter to track login attempts
 login_attempts = {}
 
-# ...
-
 @admin_bp.route('/admin', methods=["GET", "POST"])
 @admin_bp.route('/config', methods=["GET", "POST"])
 @limiter.request_filter
