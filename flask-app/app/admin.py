@@ -3,7 +3,7 @@ from datetime import datetime
 import pymongo
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from redis_utils import redis_server
+from redis_utils import redis_server  # Import redis_server from your redis_utils module
 
 # Create a Blueprint for the admin route
 admin_bp = Blueprint("admin_bp", __name__)
@@ -16,7 +16,7 @@ attackcollection = visitorsdb["attacks"]
 # Create a Limiter instance with a custom rate limit function
 limiter = Limiter(
     key_func=get_remote_address,
-    storage_uri=redis_server.uri  # Use the in-memory Redis server for storage
+    storage_uri=redis_server.connection_pool.connection_kwargs.get('uri')  # Use the connection_pool attribute
 )
 
 # Define a custom rate limit function that allows 3 tries per minute
