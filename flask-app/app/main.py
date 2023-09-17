@@ -4,10 +4,12 @@ from datetime import datetime
 import pymongo
 import os
 from flask import Flask
+from flask_limiter import Limiter
 from clicknext import clicknext_bp
 from admin import admin_bp
 import redislite
 
+limiter = Limiter(app, key_func=get_remote_address)
 redis_server = redislite.StrictRedis()
 
 # Variables
