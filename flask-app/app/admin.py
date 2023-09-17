@@ -3,7 +3,10 @@ from datetime import datetime
 import pymongo
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from main import attackcollection
+
+mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
+ipcollection = visitorsdb["visitors"]
+attackcollection = visitorsdb["attacks"]
 
 # Create a Blueprint for the admin route
 admin_bp = Blueprint("admin_bp", __name__)
