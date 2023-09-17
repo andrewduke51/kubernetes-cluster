@@ -59,7 +59,6 @@ def home():
 def honeypot(subpath=""):
     # Check if the subpath matches "/admin"
     if subpath == "admin":
-        # If the subpath is "/admin," render the admin.html template
         return render_template('admin.html')
 
     # Log and save attack details to the "attacks" collection
