@@ -7,26 +7,20 @@ from flask_limiter.util import get_remote_address
 # Create a Blueprint for the admin route
 admin_bp = Blueprint("admin_bp", __name__)
 
-# Define the IP collection variable here
+# MongoDB connection
 mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
 attackcollection = visitorsdb["attacks"]
 
-# Create a limiter instance with a rate limit of 3 attempts per minute for login
-limiter = Limiter(
-    key_func=get_remote_address,
-    storage_uri="memory://",  # You can choose a different storage option
-    default_limits=["3 per minute"]
-)
-
 # Counter to track login attempts
 login_attempts = {}
+
+# ...
 
 @admin_bp.route('/admin', methods=["GET", "POST"])
 @admin_bp.route('/config', methods=["GET", "POST"])
 @limiter.request_filter
 def honeypot():
-    # Check if the subpath matches "/admin"
     if request.method == "POST":
         # Increment the login attempt count for this IP
         remote_address = get_remote_address()
