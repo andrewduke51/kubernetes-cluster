@@ -14,12 +14,12 @@ visitorsdb = mongoconnection["ips"]
 attackcollection = visitorsdb["attacks"]
 
 # Create an in-memory Redis server using redislite
-redis_server = redislite.Redis(serverconfig={'unixsocket': True})
+redis_server = redislite.StrictRedis().from_url("redis://localhost")
 
 # Create a Limiter instance with a custom rate limit function
 limiter = Limiter(
     key_func=get_remote_address,
-    storage_uri=redis_server.uri  # Use the in-memory Redis server for storage
+    storage_uri=f"redis://{redis_server}/0"  # Use the in-memory Redis server for storage
 )
 
 # Define a custom rate limit function that allows 3 tries per minute
