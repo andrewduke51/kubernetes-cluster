@@ -21,6 +21,7 @@ ansible/playbooks/local_site.yml
 -secret*
 *secret*
 python_versions/
+__pycache__
 vars.yml
 *bootstrap.sh*
 notes
