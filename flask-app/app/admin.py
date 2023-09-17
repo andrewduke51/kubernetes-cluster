@@ -24,9 +24,12 @@ limiter = Limiter(
 def custom_rate_limit():
     remote_address = get_remote_address()
     attempts = limiter.limiter.get(remote_address)
+    print(f"Remote Address: {remote_address}, Attempts: {attempts}")
+
     if attempts is not None and attempts >= 3:
         return False  # Limit exceeded, deny the request
     return True  # Limit not exceeded, allow the request
+
 
 # Apply the limiter to the admin Blueprint
 limiter.limit(custom_rate_limit)(admin_bp)
