@@ -6,16 +6,15 @@ import socket
 import json
 import os
 
-
 # Variables ##
 app = Flask(__name__, template_folder='views')
 counter = Value('i', 0)
 mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
 visitorsdb = mongoconnection["ips"]
 ipcollection = visitorsdb["visitors"]
+attackcollection = visitorsdb["attacks"]
 
 @app.errorhandler(404)
-
 def not_found(e):
     return render_template("404.html")
 
@@ -45,10 +44,8 @@ def home():
         "ip_addresses": request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
     }
     ipcollection.insert_one(captured)
-
     # Retrieve the current visitor count from the database
     total_visitors = ipcollection.count_documents({})
-
     ip_addr = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
     return render_template('clicknext.html',
                            title="page",
@@ -56,6 +53,23 @@ def home():
                            ip_addr=ip_addr,
                            hostname=socket.gethostname()
                            )
+
+@app.route('/admin', methods=["GET", "POST"])
+@app.route('/config', methods=["GET", "POST"])
+def honeypot():
+    # Log and save attack details to the "attacks" collection
+    captured = {
+        "time_stamp": datetime.now().strftime("%m/%d/%y - %H:%M:%S"),
+        "ip_addresses": request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr),
+        "request_data": {
+            "path": request.path,
+            "method": request.method,
+            "user_agent": request.user_agent.string,
+            "data": request.get_data(as_text=True),
+        }
+    }
+    attackcollection.insert_one(captured)  # Use a separate collection for attacks
+    return "Access Denied: This is a honeypot route."
 
 @app.route('/proxy_client')
 def proxy_client():
