@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>Honeypot Response</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             display: flex;
@@ -19,25 +18,14 @@
         }
 
         p {
-            margin: 10px 0;
-            font-size: 20px;
-        }
-
-        .iframe-container {
-            position: relative;
-            width: 100%;
-            max-width: 300px;
-            height: 0;
-            padding-bottom: 75%; /* 4:3 aspect ratio */
+            margin: 0;
         }
 
         iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            width: 110px;
+            height: 200px;
             border: 0;
+            margin-top: 20px; /* Add some space between the text and iframe */
         }
 
         img {
@@ -51,10 +39,8 @@
 </head>
 <body>
 <div class="container">
-    <p>"Ha-ha! You Sucker With IP {{ ip_address }}, you've stumbled into our honeypot! 😜!!"</p>
-    <div class="iframe-container">
-        <iframe src="https://www.myinstants.com/instant/the-simpsons-nelsons-ha-ha/embed/"></iframe>
-    </div>
+    <p style="font-size: 20px;">"Ha-ha! You Sucker With IP {{ ip_address }}, you've stumbled into our honeypot! 😜!!"</p>
+    <iframe src="https://www.myinstants.com/instant/the-simpsons-nelsons-ha-ha/embed/"></iframe>
     <div class="tenor-gif-embed" data-postid="16163203" data-share-method="host" data-aspect-ratio="1.33333" data-width="100%"><a href="https://tenor.com/view/ha-ha-point-homer-simpson-simpsons-nelson-muntz-gif-16163203">Ha Ha Point GIF</a>from <a href="https://tenor.com/search/ha+ha-gifs">Ha Ha GIFs</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
 </div>
 </body>
