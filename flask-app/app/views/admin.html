@@ -20,9 +20,8 @@
         <input type="submit" value="Log In">
     </form>
 
-    {% if login_attempt >= max_login_attempts %}
+    {% if login_attempt %}
     <p style="color: red">Access denied {{ login_attempt }}</p>
-    {{ youtube_embed_code | safe }}  {# Use the | safe filter to render HTML content safely #}
     {% endif %}
 </div>
 </body>
