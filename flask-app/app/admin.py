@@ -22,9 +22,15 @@ def honeypot():
     # Get the IP address of the requester
     ip_address = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
 
-    # Check if the IP address has exceeded the max_login_attempts
-    if ip_address in ip_login_attempts and ip_login_attempts[ip_address] >= max_login_attempts:
-        # After max_login_attempts, respond with a humorous message
+    # Check if there are more than three entries with the same IP on the same date
+    today_date = datetime.now().strftime("%m/%d/%y")
+    same_date_ip_count = attackcollection.count_documents({
+        "time_stamp": {"$regex": f"{today_date}.*"},
+        "ip_addresses": ip_address
+    })
+
+    # If the count exceeds the threshold, respond with a humorous message
+    if same_date_ip_count >= max_login_attempts:
         funny_response = "Ha-ha! You've stumbled into our honeypot! 😜"
         return jsonify({"message": funny_response}), 200
 
@@ -41,6 +47,5 @@ def honeypot():
     }
     attackcollection.insert_one(captured)  # Use a separate collection for attacks
 
-    # Render the admin.html template with login_attempt count
-    login_attempt = ip_login_attempts.get(ip_address, 0)
-    return render_template('admin.html', login_attempt=login_attempt)
+    # Render the admin.html template
+    return render_template('admin.html')
