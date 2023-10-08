@@ -13,11 +13,20 @@ attackcollection = visitorsdb["attacks"]
 # Dictionary to keep track of IP addresses and their request counts
 ip_request_counts = {}
 
+# Maximum number of allowed attempts before granting access
+max_attempts = 4
+
 @admin_bp.route('/admin', methods=["GET", "POST"])
 @admin_bp.route('/config', methods=["GET", "POST"])
 def honeypot():
     # Get the IP address of the requester
     ip_address = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+
+    # Check if the IP address has exceeded the max_attempts
+    if ip_address in ip_request_counts and ip_request_counts[ip_address] >= max_attempts:
+        # Respond with a funny message after max_attempts
+        funny_response = "Ha-ha! You've stumbled into our honeypot! 😜"
+        return jsonify({"message": funny_response}), 200
 
     # Log and save attack details to the "attacks" collection
     captured = {
@@ -32,13 +41,11 @@ def honeypot():
     }
     attackcollection.insert_one(captured)  # Use a separate collection for attacks
 
-    # Check if the IP address has made multiple requests
+    # Increment the request count for the IP address
     if ip_address in ip_request_counts:
         ip_request_counts[ip_address] += 1
-        if ip_request_counts[ip_address] >= 3:
-            # After three requests, respond with a funny message
-            funny_response = "Ha-ha! You've stumbled into our honeypot! 😜"
-            return jsonify({"message": funny_response}), 200
+    else:
+        ip_request_counts[ip_address] = 1
 
     # Render the admin.html template
     return render_template('admin.html')
