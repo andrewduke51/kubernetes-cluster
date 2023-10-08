@@ -48,4 +48,4 @@ def honeypot():
         return jsonify({"message": funny_response}), 200
 
     # Render the admin.html template
-    return render_template('admin.html', login_attempt=max_login_attempts)
+    return render_template('admin.html', login_attempt=same_date_ip_count)
