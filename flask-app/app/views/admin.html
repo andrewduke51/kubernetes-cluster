@@ -19,6 +19,10 @@
         <br>
         <input type="submit" value="Log In">
     </form>
+
+    {% if login_attempt %}
+    <p style="color: red">Access denied attempt {{ login_attempt }}</p>
+    {% endif %}
 </div>
 </body>
 </html>
