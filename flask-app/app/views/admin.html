@@ -20,8 +20,8 @@
         <input type="submit" value="Log In">
     </form>
 
-    {% if login_attempt %}
-    <p style="color: red">Access denied</p>
+    {% if login_attempt >= max_login_attempts %}
+    <p style="color: red">Access denied {{ login_attempt }}</p>
     {% endif %}
 </div>
 </body>
