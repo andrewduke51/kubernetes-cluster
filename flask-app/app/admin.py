@@ -14,7 +14,7 @@ attackcollection = visitorsdb["attacks"]
 ip_login_attempts = {}
 
 # Maximum number of allowed login attempts before humorous response
-max_login_attempts = 3
+max_login_attempts = 4
 
 @admin_bp.route('/admin', methods=["GET", "POST"])
 @admin_bp.route('/config', methods=["GET", "POST"])
@@ -43,8 +43,11 @@ def honeypot():
     })
 
     # If the count exceeds the threshold, respond with a humorous message
-    if same_date_ip_count >= max_login_attempts:
+    if same_date_ip_count >= 4:
         return render_template('nel_son_return.html', ip_address=ip_address)
 
     # Render the admin.html template
-    return render_template('admin.html', login_attempt=same_date_ip_count)
+    if same_date_ip_count >= 2:
+        same_date_ip_count -= 1
+        return render_template('admin.html', login_attempt=same_date_ip_count)
+    return render_template('admin.html')
