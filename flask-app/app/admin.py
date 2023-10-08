@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, jsonify
 from datetime import datetime
 import pymongo
 
-# Create a Blueprint for the admin route
+# Create a Blueprint for the admin page
 admin_bp = Blueprint("admin_bp", __name__)
 
 # Define the IP collection variable here
