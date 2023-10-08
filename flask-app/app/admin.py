@@ -1,3 +1,21 @@
+from flask import Blueprint, render_template, request, jsonify
+from datetime import datetime
+import pymongo
+
+# Create a Blueprint for the admin route
+admin_bp = Blueprint("admin_bp", __name__)
+
+# Define the IP collection variable here
+mongoconnection = pymongo.MongoClient("mongodb://mongo-service.mongo:27017/")
+visitorsdb = mongoconnection["ips"]
+attackcollection = visitorsdb["attacks"]
+
+# Dictionary to keep track of IP addresses and their login attempts
+ip_login_attempts = {}
+
+# Maximum number of allowed login attempts before humorous response
+max_login_attempts = 3
+
 @admin_bp.route('/admin', methods=["GET", "POST"])
 @admin_bp.route('/config', methods=["GET", "POST"])
 def honeypot():
