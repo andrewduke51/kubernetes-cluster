@@ -45,7 +45,5 @@ def honeypot():
     # If the count exceeds the threshold, respond with a humorous message
     if same_date_ip_count >= max_login_attempts:
         funny_response = "Ha-ha! You've stumbled into our honeypot! 😜"
-        return jsonify({"message": funny_response}), 200
-
-    # Render the admin.html template
-    return render_template('admin.html', login_attempt=same_date_ip_count)
+        youtube_embed_code = '<iframe width="560" height="315" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>'
+        return render_template('admin.html', login_attempt=same_date_ip_count, youtube_embed_code=youtube_embed_code)
