@@ -2,6 +2,8 @@
 
 # set config
 mkdir ../local_files
+ls -all ${CIRCLE_WORKING_DIRECTORY}/
+
 echo "${CONFIG}" | base64 -d > ${CIRCLE_WORKING_DIRECTORY}/ops/config
 chmod go-r config
 
