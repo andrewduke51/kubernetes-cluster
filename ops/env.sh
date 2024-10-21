@@ -1,9 +1,8 @@
 #!/bin/bash
 
 # set config
-#mkdir ../local_files
-ls -all ${CIRCLE_WORKING_DIRECTORY}/ops
-
+mkdir ../local_files
+touch ${CIRCLE_WORKING_DIRECTORY}/ops/config
 echo "${CONFIG}" | base64 -d > ${CIRCLE_WORKING_DIRECTORY}/ops/config
 chmod go-r config
 
