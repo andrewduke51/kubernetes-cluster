@@ -13,7 +13,7 @@ jobs:
           environment:
             - SOMEVAR: placeholder
           command: |
-            /etc/profile.d/pyenv-path.sh
+            . /etc/profile.d/pyenv-path.sh
             chmod +x ops/*sh
             ops/env.sh ${SOMEVAR}
             ansible-playbook -i local_files/inventory ansible/playbooks/site.yml

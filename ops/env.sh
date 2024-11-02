@@ -4,11 +4,6 @@
 mkdir ../local_files
 echo "${CONFIG}" | base64 -d > ${CIRCLE_WORKING_DIRECTORY}/ops/config
 chmod go-r ${CIRCLE_WORKING_DIRECTORY}/ops/config
-export PYENV_ROOT="/virtual-python"
-export PATH="$PYENV_ROOT/bin:$PATH"
-export PATH="$PYENV_ROOT/shims:$PATH"
-export PATH="$PYENV_ROOT/libexec:$PATH"
-
 
 ## set ansible_local_vars
 echo "${LOCAL_VARS}" | base64 -d > ../local_files/ansible_local_vars.yml
