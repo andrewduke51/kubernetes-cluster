@@ -19,7 +19,7 @@ jobs:
             ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
             ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
       - run:
-          name: Build Docker Container with Flask App
+          name: Build Docker Container with FlaskApp
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             cd flask-app
