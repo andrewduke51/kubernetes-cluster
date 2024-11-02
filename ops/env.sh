@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # set config
-pwd
 mkdir ../local_files
 echo "${CONFIG}" | base64 -d > ${CIRCLE_WORKING_DIRECTORY}/ops/config
 chmod go-r ${CIRCLE_WORKING_DIRECTORY}/ops/config
