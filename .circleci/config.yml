@@ -22,7 +22,7 @@ jobs:
           name: Build Docker Container with FlaskApp
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-#            cd flask-app
+            cd flask-app
 #            docker build -t andrewduke51/app:latest .
 #            docker push andrewduke51/app:latest
 #      - run:
