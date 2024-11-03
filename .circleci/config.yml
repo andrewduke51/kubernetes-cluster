@@ -22,9 +22,9 @@ jobs:
           name: Build Docker Container with FlaskApp
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            cd flask-app
-            docker build -t andrewduke51/app:latest .
-            docker push andrewduke51/app:latest
+#            cd flask-app
+#            docker build -t andrewduke51/app:latest .
+#            docker push andrewduke51/app:latest
 #      - run:
 #          name: Install weavenet.yaml
 #          command: ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
