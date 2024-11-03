@@ -49,9 +49,6 @@ spec:
             requests:
               memory: "800Mi"
               cpu: "800m"
-            limits:
-              memory: "900Mi"
-              cpu: "1"
           ports:
             - containerPort: 27017
               name: mongodb
