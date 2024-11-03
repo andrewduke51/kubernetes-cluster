@@ -13,7 +13,6 @@ jobs:
           environment:
             - SOMEVAR: placeholder
           command: |
-            . /etc/profile.d/pyenv-path.sh
             chmod +x ops/*sh
             ops/env.sh ${SOMEVAR}
             ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
@@ -43,8 +42,6 @@ jobs:
       - run:
           name: Config reverse-proxy
           command: |
-            . /etc/profile.d/pyenv-path.sh
-            ansible --version
             ansible-playbook -i local_files/inventory ansible/playbooks/nginx.yml
 
 workflows:
