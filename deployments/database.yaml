@@ -43,8 +43,8 @@ spec:
     spec:
       containers:
         - name: mongo
-          image: mongo:7.0.14
-          imagePullPolicy: Always
+          image: mongo:6.0.10
+          imagePullPolicy: IfNotPresent
           resources:
             requests:
               memory: "800Mi"
@@ -63,7 +63,7 @@ spec:
       spec:
         storageClassName: standard
         accessModes:
-          - ReadWriteOnce  # Updated to ReadWriteOnce
+          - ReadWriteOnce
         resources:
           requests:
             storage: 5Gi
