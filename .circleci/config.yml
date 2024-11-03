@@ -43,6 +43,8 @@ jobs:
       - run:
           name: Config reverse-proxy
           command: |
+            . /etc/profile.d/pyenv-path.sh
+            ansible --version
             ansible-playbook -i local_files/inventory ansible/playbooks/nginx.yml
 
 workflows:
