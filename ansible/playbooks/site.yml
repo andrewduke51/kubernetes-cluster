@@ -16,7 +16,7 @@
         src: /etc/kubernetes/admin.conf
         dest: ~/.kube/config
         flat: yes
-      when: master == "yes"
+      when: inventory_hostname in groups['master']
 
 - hosts: 127.0.0.1
   connection: local
