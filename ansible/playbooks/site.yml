@@ -11,10 +11,18 @@
     - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
 
   post_tasks:
+    - name: Ensure local kube dir exists (on controller)
+      file:
+        path: "{{ lookup('env','HOME') }}/.kube"
+        state: directory
+        mode: "0700"
+      delegate_to: localhost
+      run_once: true
+
     - name: Get kube config file
       ansible.builtin.fetch:
         src: /etc/kubernetes/admin.conf
-        dest: ~/.kube/config
+        dest: "{{ lookup('env','HOME') }}/.kube/config"
         flat: yes
       when: inventory_hostname in groups['master']
 
