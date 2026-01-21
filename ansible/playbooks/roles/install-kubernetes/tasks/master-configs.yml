@@ -9,10 +9,14 @@
 - debug:
     msg: "{{ ansible_host }}"
 
+- name: Check if control-plane already initialized
+  ansible.builtin.stat:
+    path: /etc/kubernetes/admin.conf
+  register: k8s_adminconf
+
 - name: Initialize the Kubernetes cluster using kubeadm
-  script: "kubeadm.sh {{ ansible_host }}"
-  delegate_to: "k-master"
-  when: "not register_name.stat.exists"
+  ansible.builtin.script: "kubeadm.sh {{ ansible_host }}"
+  when: not k8s_adminconf.stat.exists
 
 - name: Create a directory if it does not exist
   ansible.builtin.file:

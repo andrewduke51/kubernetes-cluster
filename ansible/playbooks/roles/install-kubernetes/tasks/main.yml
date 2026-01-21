@@ -3,17 +3,17 @@
 
 - name: master-configs.yml
   include_tasks: master-configs.yml
-  when: master == "yes"
+  when: inventory_hostname in groups['master']
 
 - name: copy weave-net.yaml
   copy:
     src: weave-net.yaml
     dest: /tmp/weave-net.yaml
-  when: master == "yes"
+  when: inventory_hostname in groups['master']
 
 - name: Pre-Requisite networking kubernetes weavenet
   command: "kubectl apply -f /tmp/weave-net.yaml --kubeconfig={{ kubeadmin_config }}"
-  when: master == "yes"
+  when: inventory_hostname in groups['master']
 
 - name: Get join from master
   fetch:

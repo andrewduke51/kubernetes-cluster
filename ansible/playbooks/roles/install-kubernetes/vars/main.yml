@@ -3,6 +3,11 @@ a_list_vars:
   - some_value2
   - some_value3
 
+k8s_minor: "1.34"
+k8s_version: "1.34.2-1.1"
+k8s_keyring_path: "/etc/apt/keyrings/kubernetes-apt-keyring.gpg"
+k8s_repo_file: "kubernetes"
+
 master_ip:  "{{ hostvars['k-master']['ansible_host'] }}"
 
 kubeadmin_config: "/etc/kubernetes/admin.conf"

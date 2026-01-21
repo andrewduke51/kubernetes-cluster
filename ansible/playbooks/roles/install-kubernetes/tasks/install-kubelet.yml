@@ -1,21 +1,46 @@
-- name: Add an apt signing key for Kubernetesn
-  apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    state: present
-
-- name: Adding apt repository for Kubernetes
-  apt_repository:
-    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
-    state: present
-    filename: kubernetes.list
-
-- name: Install Kubernetes binaries
-  command: "apt-get install -y --allow-downgrades {{ item }}"
-  with_items:
-      - "kubelet"
-      - "kubeadm"
-      - "kubectl"
-
-- name: hold packages
+- name: Ensure apt keyrings dir exists
   become: yes
-  command: "apt-mark hold kubelet kubeadm kubectl"
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Install prerequisites
+  become: yes
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+    update_cache: true
+
+- name: Add Kubernetes repo key (pkgs.k8s.io)
+  become: yes
+  ansible.builtin.shell: |
+    set -euo pipefail
+    curl -fsSL "https://pkgs.k8s.io/core:/stable:/v{{ k8s_minor }}/deb/Release.key" \
+      | gpg --dearmor -o "{{ k8s_keyring_path }}"
+  args:
+    creates: "{{ k8s_keyring_path }}"
+
+- name: Add Kubernetes apt repo (pkgs.k8s.io)
+  become: yes
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ k8s_keyring_path }}] https://pkgs.k8s.io/core:/stable:/v{{ k8s_minor }}/deb/ /"
+    state: present
+    filename: "{{ k8s_repo_file }}"
+
+- name: Install Kubernetes binaries pinned
+  become: yes
+  ansible.builtin.apt:
+    name:
+      - "kubelet={{ k8s_version }}"
+      - "kubeadm={{ k8s_version }}"
+      - "kubectl={{ k8s_version }}"
+    state: present
+    update_cache: true
+
+- name: Hold packages
+  become: yes
+  ansible.builtin.command: apt-mark hold kubelet kubeadm kubectl
