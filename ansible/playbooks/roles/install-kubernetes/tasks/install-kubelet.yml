@@ -31,16 +31,17 @@
     state: present
     filename: "{{ k8s_repo_file }}"
 
-- name: Install Kubernetes binaries pinned
+- name: Ensure Kubernetes binaries are installed (do not change versions)
   become: yes
   ansible.builtin.apt:
     name:
-      - "kubelet={{ k8s_version }}"
-      - "kubeadm={{ k8s_version }}"
-      - "kubectl={{ k8s_version }}"
+      - kubelet
+      - kubeadm
+      - kubectl
     state: present
     update_cache: true
 
-- name: Hold packages
+- name: Hold kube packages (keep current versions)
   become: yes
   ansible.builtin.command: apt-mark hold kubelet kubeadm kubectl
+  changed_when: false
