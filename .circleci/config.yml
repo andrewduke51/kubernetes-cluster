@@ -15,6 +15,7 @@ jobs:
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
             ops/env.sh ${SOMEVAR}
+            source "$BASH_ENV"
             ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
             ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
       - run:
