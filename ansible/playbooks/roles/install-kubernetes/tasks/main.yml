@@ -1,39 +1,58 @@
 - name: install-kubelet.yml
   include_tasks: install-kubelet.yml
 
+# 1) Determine if cluster is already initialized (master only)
+- name: Check if control-plane already initialized
+  ansible.builtin.stat:
+    path: /etc/kubernetes/admin.conf
+  register: k8s_adminconf
+  when: inventory_hostname in groups['master']
+
+# 2) Init control-plane only if NOT initialized
 - name: master-configs.yml
   include_tasks: master-configs.yml
-  when: inventory_hostname in groups['master']
+  when:
+    - inventory_hostname in groups['master']
+    - not k8s_adminconf.stat.exists
 
+# 3) Apply CNI only on fresh init
 - name: copy weave-net.yaml
-  copy:
+  ansible.builtin.copy:
     src: weave-net.yaml
     dest: /tmp/weave-net.yaml
-  when: inventory_hostname in groups['master']
+  when:
+    - inventory_hostname in groups['master']
+    - not k8s_adminconf.stat.exists
 
 - name: Pre-Requisite networking kubernetes weavenet
-  command: "kubectl apply -f /tmp/weave-net.yaml --kubeconfig={{ kubeadmin_config }}"
-  when: inventory_hostname in groups['master']
+  ansible.builtin.command: "kubectl apply -f /tmp/weave-net.yaml --kubeconfig={{ kubeadmin_config }}"
+  when:
+    - inventory_hostname in groups['master']
+    - not k8s_adminconf.stat.exists
 
+# 4) Fetch join script from master only on fresh init
 - name: Get join from master
-  fetch:
-    src: "/tmp/run_kube_init.sh"
-    dest: "../../local_files/run_kube_init.sh"
+  ansible.builtin.fetch:
+    src: /tmp/run_kube_init.sh
+    dest: ../../local_files/run_kube_init.sh
     flat: yes
-  when: ansible_hostname == 'k-master'
+  when:
+    - inventory_hostname in groups['master']
+    - not k8s_adminconf.stat.exists
 
+# 5) Copy join script to workers only on fresh init
 - name: Add join file to nodes
-  copy:
-    src: "../../local_files/run_kube_init.sh"
-    dest: "/tmp/run_kube_init.sh"
-  when: master == "no"
+  ansible.builtin.copy:
+    src: ../../local_files/run_kube_init.sh
+    dest: /tmp/run_kube_init.sh
+    mode: "0755"
+  when:
+    - inventory_hostname not in groups['master']
+    - hostvars[groups['master'][0]].k8s_adminconf.stat.exists == false
 
-- name: create join command for nodes
-  shell: tail -n +2 /tmp/run_kube_init.sh | head -n -1 | awk '{print $5}' | tail -n 1
-  register: JOIN_TOKEN
-
-- set_fact:
-    join_token: "{{ JOIN_TOKEN.stdout }}"
-
+# 6) Join workers only on fresh init
 - name: join-nodes.yml
   include_tasks: join-nodes.yml
+  when:
+    - inventory_hostname not in groups['master']
+    - hostvars[groups['master'][0]].k8s_adminconf.stat.exists == false
