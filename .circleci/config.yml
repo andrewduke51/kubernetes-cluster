@@ -9,25 +9,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: build env
+          name: build env and make local_files directory
+          environment:
+            SOMEVAR: placeholder
           command: |
-            chmod +x ops/*.sh
-            . /etc/profile.d/pyenv-path.sh
-            . ops/env.sh "${SOMEVAR}"
-            set -euxo pipefail
-
-            echo "CIRCLE_WORKING_DIRECTORY=${CIRCLE_WORKING_DIRECTORY}"
-            echo "PWD=$(pwd)"
-            echo "KUBECONFIG=${KUBECONFIG:-<unset>}"
-
-            ls -al "${CIRCLE_WORKING_DIRECTORY}/ops/config" || true
-            head -n 5 "${CIRCLE_WORKING_DIRECTORY}/ops/config" || true
-
-            kubectl version --client
-            kubectl config view --kubeconfig "${CIRCLE_WORKING_DIRECTORY}/ops/config" --minify
-            kubectl --kubeconfig "${CIRCLE_WORKING_DIRECTORY}/ops/config" get nodes -v=8
-
-      #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
+            chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
+            ops/env.sh ${SOMEVAR}
+            kubectl get nodes
+#            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 #            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
 
       - run:
@@ -40,7 +29,6 @@ jobs:
       - run:
           name: Install weavenet.yaml
           command: |
-            source "$BASH_ENV" || true
             kubectl config current-context
             kubectl get nodes
             #ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
