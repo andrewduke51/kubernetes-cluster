@@ -31,7 +31,7 @@ jobs:
           command: |
             chmod +x ops/*sh && ops/env.sh
             kubectl config current-context
-            kubectl cluster-info         
+            kubectl get nodes        
             #ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
 #      - run:
 #          name: deploying App with HELM
