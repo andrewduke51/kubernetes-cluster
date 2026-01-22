@@ -18,37 +18,33 @@ jobs:
             source "$BASH_ENV"
             ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
             ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
-      - run:
-          name: Build Docker Container with FlaskApp
-          command: |
-            sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
-            cd flask-app
-            sudo docker build -t andrewduke51/app:latest .
-            sudo docker push andrewduke51/app:latest
+#      - run:
+#          name: Build Docker Container with FlaskApp
+#          command: |
+#            sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
+#            cd flask-app
+#            sudo docker build -t andrewduke51/app:latest .
+#            sudo docker push andrewduke51/app:latest
 #      - run:
 #          name: Install weavenet.yaml
 #          command: ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
-      - run:
-          name: deploying App with HELM
-          env:
-            - KUBECONFIG: ./ops/config
-          command: |
-            helm upgrade --install app \
-              --values HELM/app-values.yaml HELM
-            kubectl rollout restart deployment/app-deployment -n app
-      - run:
-          name: Rollout Database Statefulset
-          env:
-            - KUBECONFIG: ./ops/config
-          command: |
-            kubectl apply -f deployments/database.yaml
-            kubectl rollout restart statefulset/mongo-statefulset -n mongo
-
-      - run:
-          name: Config reverse-proxy
-          command: |
-            . /etc/profile.d/pyenv-path.sh
-            ansible-playbook -i local_files/inventory ansible/playbooks/nginx.yml
+#      - run:
+#          name: deploying App with HELM
+#          command: |
+#            helm upgrade --install app \
+#              --values HELM/app-values.yaml HELM
+#            kubectl rollout restart deployment/app-deployment -n app
+#      - run:
+#          name: Rollout Database Statefulset
+#          command: |
+#            kubectl apply -f deployments/database.yaml
+#            kubectl rollout restart statefulset/mongo-statefulset -n mongo
+#
+#      - run:
+#          name: Config reverse-proxy
+#          command: |
+#            . /etc/profile.d/pyenv-path.sh
+#            ansible-playbook -i local_files/inventory ansible/playbooks/nginx.yml
 
 workflows:
   version: 2.1
