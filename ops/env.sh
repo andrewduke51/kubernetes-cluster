@@ -3,6 +3,7 @@ set -euo pipefail
 
 mkdir -p local_files
 
+rm ${CIRCLE_WORKING_DIRECTORY}/ops/config || true
 echo "${CONFIG}"     | base64 -d > "${CIRCLE_WORKING_DIRECTORY}/ops/config"
 chmod go-r "${CIRCLE_WORKING_DIRECTORY}/ops/config"
 
