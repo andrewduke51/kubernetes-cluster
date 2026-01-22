@@ -35,8 +35,20 @@ jobs:
             
             echo "=== auth test (ops/config) ==="
             kubectl --kubeconfig "${CIRCLE_WORKING_DIRECTORY}/ops/config" get nodes -v=6 || true
-  
-            kubectl get nodes
+            
+            echo "=== try WITHOUT KUBECONFIG (force ~/.kube/config) ==="
+            unset KUBECONFIG
+            kubectl --kubeconfig "$HOME/.kube/config" get nodes -v=6
+
+            echo "=== client cert dates (ops/config) ==="
+            python3 - <<'PY'
+            import base64, yaml
+            p="/var/lib/circleci-runner/workdir/ops/config"
+            d=yaml.safe_load(open(p))
+            cc=[u for u in d["users"] if u["name"]==d["current-context"].split("@")[0] or True][0]["user"]["client-certificate-data"]
+            print(base64.b64decode(cc).decode().split("-----END CERTIFICATE-----")[0]+"-----END CERTIFICATE-----")
+            PY | openssl x509 -noout -dates
+
 #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 #            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
 
