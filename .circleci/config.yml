@@ -14,7 +14,7 @@ jobs:
             SOMEVAR: placeholder
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
-            ops/env.sh ${SOMEVAR}
+            ops/env.sh
             kubectl get nodes
 #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 #            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
@@ -30,8 +30,7 @@ jobs:
           name: Install weavenet.yaml
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
-            ops/env.sh placeholder
-            kubectl config current-context
+            ops/env.sh
             kubectl get nodes
             #ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
 #      - run:
