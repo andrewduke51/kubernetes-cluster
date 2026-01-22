@@ -13,6 +13,29 @@ jobs:
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
             . ops/env.sh
+            set -euxo pipefail
+
+            echo "WHOAMI=$(whoami)"
+            echo "HOME=$HOME"
+            echo "PWD=$(pwd)"
+            echo "CIRCLE_WORKING_DIRECTORY=${CIRCLE_WORKING_DIRECTORY:-}"
+            
+            echo "=== files ==="
+            ls -al "${CIRCLE_WORKING_DIRECTORY}/ops/config" || true
+            ls -al "$HOME/.kube/config" || true
+            
+            echo "=== current-context (default) ==="
+            kubectl config current-context || true
+            
+            echo "=== current-context (ops/config) ==="
+            kubectl --kubeconfig "${CIRCLE_WORKING_DIRECTORY}/ops/config" config current-context || true
+            
+            echo "=== auth test (default) ==="
+            kubectl get nodes -v=6 || true
+            
+            echo "=== auth test (ops/config) ==="
+            kubectl --kubeconfig "${CIRCLE_WORKING_DIRECTORY}/ops/config" get nodes -v=6 || true
+  
             kubectl get nodes
 #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 #            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
