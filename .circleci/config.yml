@@ -13,7 +13,7 @@ jobs:
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
             . ops/env.sh
-            ls -all ${CIRCLE_WORKING_DIRECTORY}"'/ops/config
+            ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/config
             #python3 -c 'import base64,yaml; d=yaml.safe_load(open("'"${CIRCLE_WORKING_DIRECTORY}"'/ops/config")); print(base64.b64decode(d["users"][0]["user"]["client-certificate-data"]).decode())' \  | openssl x509 -noout -dates
 
 #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
