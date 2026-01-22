@@ -29,7 +29,7 @@ jobs:
       - run:
           name: Install weavenet.yaml
           command: |
-            source "$BASH_ENV"
+            ops/env.sh
             kubectl config current-context || true
             kubectl cluster-info            
             #ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
