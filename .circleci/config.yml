@@ -18,6 +18,7 @@ jobs:
             source "$BASH_ENV"
             ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
             ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
+            kubectl get nodes
 #      - run:
 #          name: Build Docker Container with FlaskApp
 #          command: |
