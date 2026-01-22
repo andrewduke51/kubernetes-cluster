@@ -11,8 +11,6 @@ jobs:
       - run:
           name: build env and make local_files directory
           command: |
-#            chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
-#            ops/env.sh
             kubectl get nodes
 #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 #            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
