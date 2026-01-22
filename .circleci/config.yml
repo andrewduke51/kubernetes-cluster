@@ -11,7 +11,7 @@ jobs:
       - run:
           name: build env and make local_files directory
           environment:
-            - SOMEVAR: placeholder
+            SOMEVAR: placeholder
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
             ops/env.sh ${SOMEVAR}
@@ -29,25 +29,27 @@ jobs:
       - run:
           name: Install weavenet.yaml
           command: |
-            env
+            ls -al "${CIRCLE_WORKING_DIRECTORY}/ops/config"
+            kubectl config current-context || true
+            kubectl cluster-info            
             #ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
-      - run:
-          name: deploying App with HELM
-          command: |
-            helm upgrade --install app \
-              --values HELM/app-values.yaml HELM
-            kubectl rollout restart deployment/app-deployment -n app
-      - run:
-          name: Rollout Database Statefulset
-          command: |
-            kubectl apply -f deployments/database.yaml
-            kubectl rollout restart statefulset/mongo-statefulset -n mongo
-
-      - run:
-          name: Config reverse-proxy
-          command: |
-            . /etc/profile.d/pyenv-path.sh
-            ansible-playbook -i local_files/inventory ansible/playbooks/nginx.yml
+#      - run:
+#          name: deploying App with HELM
+#          command: |
+#            helm upgrade --install app \
+#              --values HELM/app-values.yaml HELM
+#            kubectl rollout restart deployment/app-deployment -n app
+#      - run:
+#          name: Rollout Database Statefulset
+#          command: |
+#            kubectl apply -f deployments/database.yaml
+#            kubectl rollout restart statefulset/mongo-statefulset -n mongo
+#
+#      - run:
+#          name: Config reverse-proxy
+#          command: |
+#            . /etc/profile.d/pyenv-path.sh
+#            ansible-playbook -i local_files/inventory ansible/playbooks/nginx.yml
 
 workflows:
   version: 2.1
