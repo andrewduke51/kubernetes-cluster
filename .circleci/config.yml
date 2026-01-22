@@ -30,12 +30,16 @@ jobs:
 #          command: ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
       - run:
           name: deploying App with HELM
+          env:
+            - KUBECONFIG: ./ops/config
           command: |
             helm upgrade --install app \
               --values HELM/app-values.yaml HELM
             kubectl rollout restart deployment/app-deployment -n app
       - run:
           name: Rollout Database Statefulset
+          env:
+            - KUBECONFIG: ./ops/config
           command: |
             kubectl apply -f deployments/database.yaml
             kubectl rollout restart statefulset/mongo-statefulset -n mongo
