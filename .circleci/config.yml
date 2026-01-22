@@ -10,8 +10,6 @@ jobs:
       - checkout
       - run:
           name: build env and make local_files directory
-          environment:
-            SOMEVAR: placeholder
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
             ops/env.sh
