@@ -10,30 +10,6 @@
     - { role: install-containerd, when: "'kubernetescluster' in group_names" }
     - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
 
-  post_tasks:
-    - name: Ensure local kube dir exists (on controller)
-      file:
-        path: "{{ lookup('env','HOME') }}/.kube"
-        state: directory
-        mode: "0700"
-      delegate_to: localhost
-      run_once: true
-
-    - name: Verify kubeconfig exists on controller
-      stat:
-        path: "{{ lookup('env','HOME') }}/.kube/config"
-      register: kubeconfig_stat
-
-    - debug:
-        var: kubeconfig_stat.stat.exists
-
-    - name: Get kube config file
-      ansible.builtin.fetch:
-        src: /etc/kubernetes/admin.conf
-        dest: "{{ lookup('env','HOME') }}/.kube/config"
-        flat: yes
-      when: inventory_hostname == groups['master'][0]
-
 - hosts: 127.0.0.1
   connection: local
   tasks:

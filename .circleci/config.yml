@@ -15,10 +15,8 @@ jobs:
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
             ops/env.sh ${SOMEVAR}
-            env
-            kubectl get nodes
-#            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
-#            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
+            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
+            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
 
 #      - run:
 #          name: Build Docker Container with FlaskApp
