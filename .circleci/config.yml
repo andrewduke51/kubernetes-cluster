@@ -12,45 +12,9 @@ jobs:
           name: build env and make local_files directory
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
-            . ops/env.sh
-            set -euxo pipefail
-
-            echo "WHOAMI=$(whoami)"
-            echo "HOME=$HOME"
-            echo "PWD=$(pwd)"
-            echo "CIRCLE_WORKING_DIRECTORY=${CIRCLE_WORKING_DIRECTORY:-}"
-
-            echo "=== files ==="
-            ls -al "${CIRCLE_WORKING_DIRECTORY}/ops/config" || true
-            ls -al "$HOME/.kube/config" || true
-
-            echo "=== current-context (default) ==="
-            kubectl config current-context || true
-
-            echo "=== current-context (ops/config) ==="
-            kubectl --kubeconfig "${CIRCLE_WORKING_DIRECTORY}/ops/config" config current-context || true
-
-            echo "=== auth test (default) ==="
-            kubectl get nodes -v=6 || true
-
-            echo "=== auth test (ops/config) ==="
-            kubectl --kubeconfig "${CIRCLE_WORKING_DIRECTORY}/ops/config" get nodes -v=6 || true
-
-            echo "=== try WITHOUT KUBECONFIG (force ~/.kube/config) ==="
-            unset KUBECONFIG
-            kubectl --kubeconfig "$HOME/.kube/config" get nodes -v=6
-
-            echo "=== client cert dates (ops/config) ==="
-            python3 - \<<'PY' | openssl x509 -noout -dates
-            import base64, yaml
-            p="/var/lib/circleci-runner/workdir/ops/config"
-            d=yaml.safe_load(open(p))
-            cc=d["users"][0]["user"]["client-certificate-data"]
-            print(base64.b64decode(cc).decode())
-            PY
-
-
-#            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
+            ops/env.sh
+            kubectl --kubeconfig "${CIRCLE_WORKING_DIRECTORY}/ops/config" get nodes
+      #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 #            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
 
       - run:
@@ -64,7 +28,7 @@ jobs:
           name: Install weavenet.yaml
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
-            . ops/env.sh
+            ops/env.sh
             kubectl get nodes
             #ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
 #      - run:
