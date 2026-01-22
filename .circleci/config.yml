@@ -9,12 +9,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: build env and make local_files directory
-          environment:
-            SOMEVAR: placeholder
+          name: build env
           command: |
-            chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
-            ops/env.sh ${SOMEVAR}
+            chmod +x ops/*.sh
+            . /etc/profile.d/pyenv-path.sh
+            . ops/env.sh "${SOMEVAR}"
             kubectl get nodes
 #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 #            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
@@ -29,6 +28,7 @@ jobs:
       - run:
           name: Install weavenet.yaml
           command: |
+            source "$BASH_ENV" || true
             kubectl config current-context
             kubectl get nodes
             #ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
