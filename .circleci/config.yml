@@ -13,7 +13,7 @@ jobs:
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
             ops/env.sh
-            kubectl get nodes --kubeconfig=${CIRCLE_WORKING_DIRECTORY}/ops/config
+            kubectl get nodes
 #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 #            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
 
