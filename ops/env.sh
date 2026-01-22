@@ -3,9 +3,8 @@ set -euo pipefail
 
 mkdir -p local_files
 
-rm ${CIRCLE_WORKING_DIRECTORY}/ops/config || true
-echo "${CONFIG}"     | base64 -d > "${CIRCLE_WORKING_DIRECTORY}/ops/config"
-chmod go-r "${CIRCLE_WORKING_DIRECTORY}/ops/config"
+echo "${CONFIG}"     | base64 -d > "local_files/config"
+chmod go-r "local_files/config"
 
 echo "${LOCAL_VARS}" | base64 -d > "local_files/ansible_local_vars.yml"
 echo "${INVENTORY}"  | base64 -d > "local_files/inventory"
