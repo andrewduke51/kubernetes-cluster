@@ -29,9 +29,9 @@ jobs:
       - run:
           name: Install weavenet.yaml
           command: |
-            ops/env.sh
-            kubectl config current-context || true
-            kubectl cluster-info --kubeconfig=${CIRCLE_WORKING_DIRECTORY}/ops/config            
+            chmod +x ops/*sh && ops/env.sh
+            kubectl config current-context
+            #kubectl cluster-info --kubeconfig=${CIRCLE_WORKING_DIRECTORY}/ops/config            
             #ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
 #      - run:
 #          name: deploying App with HELM
