@@ -51,8 +51,8 @@
     - hostvars[groups['master'][0]].k8s_adminconf.stat.exists == false
 
 # 6) Join workers only on fresh init
-- name: join-nodes.yml
-  include_tasks: join-nodes.yml
-  when:
-    - inventory_hostname not in groups['master']
-    - hostvars[groups['master'][0]].k8s_adminconf.stat.exists == false
+#- name: join-nodes.yml
+#  include_tasks: join-nodes.yml
+#  when:
+#    - inventory_hostname not in groups['master']
+#    - hostvars[groups['master'][0]].k8s_adminconf.stat.exists == false
