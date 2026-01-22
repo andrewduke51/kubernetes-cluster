@@ -13,7 +13,15 @@ jobs:
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
             . ops/env.sh
-            kubectl get nodes
+            python3 - <<'PY' | openssl x509 -noout -dates
+            import base64, yaml
+            p="${CIRCLE_WORKING_DIRECTORY}/ops/config"
+            d=yaml.safe_load(open(p))
+            # assumes first user has client-certificate-data
+            cc=d["users"][0]["user"]["client-certificate-data"]
+            print(base64.b64decode(cc))
+            PY
+
 
 #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 #            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
