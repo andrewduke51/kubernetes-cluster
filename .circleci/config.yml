@@ -12,8 +12,8 @@ jobs:
           name: build env and make local_files directory
           command: |
             chmod +x ops/*sh && . /etc/profile.d/pyenv-path.sh
-            echo "${CONFIG}"
-            #python3 -c 'import base64,yaml; d=yaml.safe_load(open("'"${CIRCLE_WORKING_DIRECTORY}"'/ops/config")); print(base64.b64decode(d["users"][0]["user"]["client-certificate-data"]).decode())' \  | openssl x509 -noout -dates
+            ops/env.sh
+            kubectl get nodes
 #            ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 #            ansible-playbook -i local_files/inventory ansible/playbooks/ping.yml
 
