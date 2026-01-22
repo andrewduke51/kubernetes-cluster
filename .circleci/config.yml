@@ -27,9 +27,7 @@ jobs:
             sudo docker push andrewduke51/app:latest
       - run:
           name: Install weavenet.yaml
-          env:
-            KUBECONFIG: ${CIRCLE_WORKING_DIRECTORY}/ops/config
-          command: ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml
+          command: ls -all ${CIRCLE_WORKING_DIRECTORY}/ops/ && kubectl apply -f deployments/weavenet.yaml --kubeconfig=${CIRCLE_WORKING_DIRECTORY}/ops/config
       - run:
           name: deploying App with HELM
           command: |
