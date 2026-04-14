@@ -9,6 +9,8 @@ k8s_keyring_path: "/etc/apt/keyrings/kubernetes-apt-keyring.gpg"
 k8s_repo_file: "kubernetes"
 
 master_ip:  "{{ hostvars['k-master']['ansible_host'] }}"
+kube_control_plane_endpoint: "kube-api.local"
+kube_api_server: "https://{{ kube_control_plane_endpoint }}:6443"
 
 kubeadmin_config: "/etc/kubernetes/admin.conf"
 node_ip_master: "{{ hostvars[groups['kubernetescluster'][0]]['ansible_default_ipv4']['address'] }}"

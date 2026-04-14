@@ -15,7 +15,7 @@
   register: k8s_adminconf
 
 - name: Initialize the Kubernetes cluster using kubeadm
-  ansible.builtin.script: "kubeadm.sh {{ ansible_host }}"
+  ansible.builtin.script: "kubeadm.sh {{ ansible_host }} {{ kube_control_plane_endpoint }}"
   when: not k8s_adminconf.stat.exists
 
 - name: Create a directory if it does not exist

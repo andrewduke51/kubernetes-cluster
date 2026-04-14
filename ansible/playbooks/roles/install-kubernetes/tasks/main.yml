@@ -1,6 +1,13 @@
 - name: install-kubelet.yml
   include_tasks: install-kubelet.yml
 
+- name: Ensure kube-api.local resolves to current control-plane IP
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^\S+\s+{{ kube_control_plane_endpoint | regex_escape }}$'
+    line: "{{ master_ip }} {{ kube_control_plane_endpoint }}"
+    state: present
+
 # 1) Determine if cluster is already initialized (master only)
 - name: Check if control-plane already initialized
   ansible.builtin.stat:
@@ -14,6 +21,30 @@
   when:
     - inventory_hostname in groups['master']
     - not k8s_adminconf.stat.exists
+
+- name: Ensure existing control-plane kubeconfigs use stable API endpoint
+  ansible.builtin.replace:
+    path: "{{ item }}"
+    regexp: 'server:\s+https://[^:]+:6443'
+    replace: "server: {{ kube_api_server }}"
+  loop:
+    - /etc/kubernetes/controller-manager.conf
+    - /etc/kubernetes/scheduler.conf
+  register: control_plane_kubeconfigs
+  when:
+    - inventory_hostname in groups['master']
+    - k8s_adminconf.stat.exists
+
+- name: Restart scheduler and controller-manager when kubeconfigs change
+  ansible.builtin.shell: |
+    set -e
+    crictl ps --name kube-controller-manager -q | xargs -r crictl stop
+    crictl ps --name kube-scheduler -q | xargs -r crictl stop
+  args:
+    executable: /bin/bash
+  when:
+    - inventory_hostname in groups['master']
+    - control_plane_kubeconfigs is changed
 
 # 3) Apply CNI only on fresh init
 - name: copy weave-net.yaml

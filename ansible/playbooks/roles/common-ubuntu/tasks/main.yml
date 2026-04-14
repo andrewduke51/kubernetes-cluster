@@ -2,7 +2,8 @@
   lineinfile:
     path: /etc/hosts
     state: present
-    line: "{{ master_ip }}  kube-api.local"
+    regexp: '^\S+\s+kube-api\.local$'
+    line: "{{ master_ip }} kube-api.local"
 
 - name: common.yml
   include_tasks: common.yml

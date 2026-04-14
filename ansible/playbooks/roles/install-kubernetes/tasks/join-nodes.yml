@@ -6,7 +6,8 @@
   lineinfile:
     path: /etc/hosts
     state: present
-    line: "{{ master_ip }}  kube-api.local"
+    regexp: '^\S+\s+{{ kube_control_plane_endpoint | regex_escape }}$'
+    line: "{{ master_ip }} {{ kube_control_plane_endpoint }}"
   when: master == "no"
 
 - name: check if file exists
@@ -15,7 +16,7 @@
   register: joined
 
 - name: join node
-  shell: "kubeadm join kube-api.local:6443 --token {{ join_token }} --discovery-token-unsafe-skip-ca-verification"
+  shell: "kubeadm join {{ kube_control_plane_endpoint }}:6443 --token {{ join_token }} --discovery-token-unsafe-skip-ca-verification"
   when: master == "no" and joined.stat.exists == False
 
 - name: create /etc/containerd/done
