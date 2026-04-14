@@ -20,6 +20,17 @@
     hour: "*/4"
     job: "/post_scripts/cloudflare_ips.sh"
 
+- name: Resolve Kubernetes worker upstream names from inventory
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^\S+\s+{{ item }}\.lab$'
+    line: "{{ hostvars[item].ansible_host }} {{ item }}.lab"
+    state: present
+  loop: "{{ groups['kubernetescluster'] | default([]) }}"
+  when:
+    - item not in groups['master'] | default([])
+    - hostvars[item].ansible_host is defined
+
 - name: delete default file
   ansible.builtin.file:
     path: /etc/nginx/sites-available/default
