@@ -3,49 +3,54 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>404 - Timeline Missed</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/404.css') }}">
+    <title>404 - Page Not Found</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/colors.css') }}">
 </head>
 <body>
-<main class="not-found">
-    <section class="scene" aria-label="Page not found">
-        <div class="stars" aria-hidden="true"></div>
-
-        <div class="road" aria-hidden="true">
-            <div class="road-line"></div>
-            <div class="sparks sparks-left"></div>
-            <div class="sparks sparks-right"></div>
-
-            <svg class="time-car" viewBox="0 0 520 220" role="img" aria-labelledby="car-title car-desc">
-                <title id="car-title">Time machine car</title>
-                <desc id="car-desc">A small car leaving bright tracks on a dark road.</desc>
-                <path class="car-shadow" d="M72 183h365c25 0 45 6 45 14s-20 14-45 14H72c-25 0-45-6-45-14s20-14 45-14Z"/>
-                <path class="car-body" d="M52 132l62-54 78-16h119l86 28 66 58-24 31H87l-35-47Z"/>
-                <path class="car-roof" d="M171 72h118l72 45H125l46-45Z"/>
-                <path class="window" d="M182 82h80l28 34H151l31-34Z"/>
-                <path class="window rear" d="M280 82h12l52 34h-42l-22-34Z"/>
-                <path class="bumper" d="M62 148h47l20 31H87l-25-31Z"/>
-                <path class="bumper" d="M399 148h55l-24 31h-51l20-31Z"/>
-                <circle class="wheel" cx="148" cy="174" r="33"/>
-                <circle class="wheel" cx="364" cy="174" r="33"/>
-                <circle class="hub" cx="148" cy="174" r="14"/>
-                <circle class="hub" cx="364" cy="174" r="14"/>
-                <path class="flux" d="M252 97l-18 50h34l-24 42 64-63h-36l24-29h-44Z"/>
-                <path class="headlight" d="M453 143l38 8-39 13-17-15 18-6Z"/>
-                <path class="tail-light" d="M54 134l-28-4 30 21 17-6-19-11Z"/>
-            </svg>
+<section class="notFound">
+    <div class="img" aria-hidden="true">
+        <div class="back-title">
+            <span>BACK</span>
+            <small>TO THE</small>
+            <span>HOMEPAGE</span>
         </div>
 
-        <section class="panel">
-            <p class="eyebrow">Timeline error</p>
-            <h1>404</h1>
-            <p class="message">This page vanished at 88 mph.</p>
-            <div class="actions">
-                <a class="button primary" href="{{ url_for('index') }}">Back home</a>
-                <a class="button secondary" href="https://www.youtube.com/watch?v=G3AfIvJBcGo">Risk it</a>
-            </div>
-        </section>
-    </section>
-</main>
+        <svg class="pixel-car" viewBox="0 0 720 280" role="img" aria-label="A pixel time machine parked beside two travelers">
+            <rect class="shadow" x="72" y="232" width="545" height="24"/>
+            <rect class="person jacket" x="52" y="112" width="30" height="78"/>
+            <rect class="person jeans" x="64" y="178" width="22" height="58"/>
+            <rect class="person skin" x="60" y="88" width="27" height="28"/>
+            <rect class="person hair" x="56" y="80" width="34" height="18"/>
+            <rect class="person shoe" x="49" y="232" width="48" height="10"/>
+            <rect class="coat" x="584" y="110" width="44" height="88"/>
+            <rect class="coat-light" x="570" y="128" width="34" height="70"/>
+            <rect class="person skin" x="590" y="82" width="32" height="34"/>
+            <rect class="person hair" x="580" y="74" width="48" height="15"/>
+            <polygon class="car-top" points="200,86 360,58 470,96 520,136 148,136"/>
+            <polygon class="car-body" points="114,138 196,102 500,118 626,164 604,212 120,212 82,180"/>
+            <polygon class="windshield" points="278,82 355,70 442,102 390,126 246,124"/>
+            <polygon class="window" points="186,108 266,88 236,124 150,128"/>
+            <rect class="stripe" x="112" y="168" width="486" height="16"/>
+            <rect class="door" x="268" y="142" width="138" height="66"/>
+            <rect class="vent" x="438" y="152" width="92" height="18"/>
+            <rect class="bumper" x="580" y="182" width="66" height="18"/>
+            <rect class="tail" x="82" y="162" width="36" height="18"/>
+            <circle class="wheel" cx="180" cy="212" r="42"/>
+            <circle class="wheel" cx="478" cy="212" r="42"/>
+            <circle class="hub" cx="180" cy="212" r="18"/>
+            <circle class="hub" cx="478" cy="212" r="18"/>
+            <rect class="plate" x="420" y="160" width="120" height="18"/>
+            <text class="plate-text" x="434" y="174">OUTATIME</text>
+        </svg>
+    </div>
+
+    <div class="text">
+        <h1>404</h1>
+        <h2>PAGE NOT FOUND</h2>
+        <h3>BACK TO HOME?</h3>
+        <a href="{{ url_for('index') }}" class="yes">YES</a>
+        <a href="https://9gag.com/some" rel="noopener">NO</a>
+    </div>
+</section>
 </body>
 </html>

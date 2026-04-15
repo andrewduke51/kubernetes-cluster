@@ -22,6 +22,130 @@ section.notFound {
     height: 100vh;
 }
 
+section.notFound .img {
+    width: min(760px, 58vw);
+}
+
+.back-title {
+    display: grid;
+    justify-items: start;
+    margin-bottom: 24px;
+    text-align: left;
+    transform: skew(-10deg);
+}
+
+.back-title span,
+.back-title small {
+    display: block;
+    color: #FFFFFF;
+    line-height: 0.82;
+    text-align: left;
+    text-shadow: 8px 8px 0 #000000;
+}
+
+.back-title span {
+    font-size: clamp(46px, 8vw, 118px);
+}
+
+.back-title small {
+    padding-left: 26px;
+    font-size: clamp(18px, 3vw, 46px);
+}
+
+.pixel-car {
+    display: block;
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+}
+
+.shadow {
+    fill: rgba(0, 0, 0, 0.72);
+}
+
+.car-body {
+    fill: #9FAAB0;
+}
+
+.car-top {
+    fill: #C7D0D7;
+}
+
+.windshield {
+    fill: #D7E0E6;
+}
+
+.window {
+    fill: #34393C;
+}
+
+.stripe,
+.door,
+.vent {
+    fill: #4B5357;
+}
+
+.bumper {
+    fill: #C0C4C6;
+}
+
+.tail {
+    fill: #E03722;
+}
+
+.wheel {
+    fill: #101010;
+}
+
+.hub {
+    fill: #DDE1E4;
+}
+
+.plate {
+    fill: #E7E7E7;
+}
+
+.plate-text {
+    fill: #B3542B;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-anchor: start;
+}
+
+.person {
+    shape-rendering: crispEdges;
+}
+
+.jacket {
+    fill: #A83D22;
+}
+
+.jeans {
+    fill: #7E94A6;
+}
+
+.skin {
+    fill: #D5A072;
+}
+
+.hair {
+    fill: #745132;
+}
+
+.shoe {
+    fill: #E6E6E6;
+}
+
+.coat {
+    fill: #E8ECEF;
+}
+
+.coat-light {
+    fill: #BFC8CE;
+}
+
 section.notFound h1 {
     color: red;
     font-size: 100px;
@@ -37,6 +161,7 @@ section.notFound h1, h2, h3 {
 
 div.text {
     height: 50vh;
+    min-width: 360px;
 }
 
 div.text a {
@@ -53,17 +178,34 @@ div.text a:hover {
     section.notFound {
         flex-direction: column;
         justify-content: space-around;
-    }
-    section.notFound div.img img {
-        width: 70vw;
+        margin: 0 6%;
         height: auto;
+        min-height: 100vh;
+        padding: 30px 0;
     }
+
+    section.notFound .img {
+        width: 88vw;
+    }
+
+    .back-title {
+        align-items: center;
+        margin-bottom: 14px;
+    }
+
     section.notFound h1 {
         font-size: 50px;
     }
+
     section.notFound h2 {
         font-size: 25px;
     }
+
+    div.text {
+        min-width: 0;
+        height: auto;
+    }
+
     div.text a:active {
         color: red;
         text-decoration: underline;
