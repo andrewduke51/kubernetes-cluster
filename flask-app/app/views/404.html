@@ -7,50 +7,23 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/colors.css') }}">
 </head>
 <body>
-<section class="notFound">
-    <div class="img" aria-hidden="true">
-        <div class="back-title">
-            <span>BACK</span>
-            <small>TO THE</small>
-            <span>HOMEPAGE</span>
+<main class="not-found">
+    <section class="error-panel" aria-labelledby="not-found-title">
+        <img
+            class="monkey"
+            src="{{ url_for('static', filename='images/nft_monkey.png') }}"
+            alt="Confused monkey"
+        >
+        <div class="copy">
+            <h1 id="not-found-title">404</h1>
+            <p class="message">This page is not available. Sorry about that.</p>
+            <p class="hint">Try heading home, or search YouTube for something better.</p>
+            <div class="actions">
+                <a class="button primary" href="{{ url_for('index') }}">Back home</a>
+                <a class="button secondary" href="https://www.youtube.com/results?search_query=funny+monkey+404" rel="noopener">Search YouTube</a>
+            </div>
         </div>
-
-        <svg class="pixel-car" viewBox="0 0 720 280" role="img" aria-label="A pixel time machine parked beside two travelers">
-            <rect class="shadow" x="72" y="232" width="545" height="24"/>
-            <rect class="person jacket" x="52" y="112" width="30" height="78"/>
-            <rect class="person jeans" x="64" y="178" width="22" height="58"/>
-            <rect class="person skin" x="60" y="88" width="27" height="28"/>
-            <rect class="person hair" x="56" y="80" width="34" height="18"/>
-            <rect class="person shoe" x="49" y="232" width="48" height="10"/>
-            <rect class="coat" x="584" y="110" width="44" height="88"/>
-            <rect class="coat-light" x="570" y="128" width="34" height="70"/>
-            <rect class="person skin" x="590" y="82" width="32" height="34"/>
-            <rect class="person hair" x="580" y="74" width="48" height="15"/>
-            <polygon class="car-top" points="200,86 360,58 470,96 520,136 148,136"/>
-            <polygon class="car-body" points="114,138 196,102 500,118 626,164 604,212 120,212 82,180"/>
-            <polygon class="windshield" points="278,82 355,70 442,102 390,126 246,124"/>
-            <polygon class="window" points="186,108 266,88 236,124 150,128"/>
-            <rect class="stripe" x="112" y="168" width="486" height="16"/>
-            <rect class="door" x="268" y="142" width="138" height="66"/>
-            <rect class="vent" x="438" y="152" width="92" height="18"/>
-            <rect class="bumper" x="580" y="182" width="66" height="18"/>
-            <rect class="tail" x="82" y="162" width="36" height="18"/>
-            <circle class="wheel" cx="180" cy="212" r="42"/>
-            <circle class="wheel" cx="478" cy="212" r="42"/>
-            <circle class="hub" cx="180" cy="212" r="18"/>
-            <circle class="hub" cx="478" cy="212" r="18"/>
-            <rect class="plate" x="420" y="160" width="120" height="18"/>
-            <text class="plate-text" x="434" y="174">OUTATIME</text>
-        </svg>
-    </div>
-
-    <div class="text">
-        <h1>404</h1>
-        <h2>PAGE NOT FOUND</h2>
-        <h3>BACK TO HOME?</h3>
-        <a href="{{ url_for('index') }}" class="yes">YES</a>
-        <a href="https://9gag.com/some" rel="noopener">NO</a>
-    </div>
-</section>
+    </section>
+</main>
 </body>
 </html>
