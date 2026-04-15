@@ -1,129 +1,194 @@
-* {
-    box-sizing: border-box;
-}
+@import url("https://fonts.googleapis.com/css?family=Exo+2:400,900italic,900");
 
 html,
 body {
-    min-height: 100%;
+    height: 100%;
 }
 
 body {
+    display: block;
     margin: 0;
-    color: #0f0f0f;
-    background: #f9f9f9;
-    font-family: Arial, Helvetica, sans-serif;
+    background-color: #062525;
+    color: #ffffff;
+    font-family: "Exo 2", Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: lighter;
 }
 
 .not-found {
-    display: grid;
+    position: relative;
     min-height: 100vh;
-    place-items: center;
-    padding: 90px 20px 32px;
+    overflow: hidden;
 }
 
-.error-panel {
-    display: grid;
-    width: min(1020px, 100%);
-    grid-template-columns: minmax(180px, 300px) 1fr;
-    align-items: center;
-    gap: 86px;
-    transform: translateY(34px);
-}
-
-.monkey {
+#container {
+    position: relative;
+    z-index: 1;
     display: block;
-    width: min(300px, 100%);
-    aspect-ratio: 1;
-    border-radius: 8px;
-    object-fit: cover;
+    width: 100%;
+    height: 100vh;
+    margin: auto;
+    overflow: hidden;
+    animation: noise-3 1.5s linear infinite;
 }
 
-.copy {
-    max-width: 560px;
+#container::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    pointer-events: none;
+    animation: noise-1 0.2s linear infinite;
+}
+
+.deloreanblue {
+    height: 130%;
+    background: url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/127764/delorean_blue.png") fixed center;
+    background-blend-mode: luminosity;
+    background-repeat: no-repeat;
+    background-size: 130% auto;
+    transform-style: preserve-3d;
+}
+
+.deloreanred {
+    height: 130%;
+    background: url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/127764/delorean_red_2_4.png") fixed center;
+    background-blend-mode: luminosity;
+    background-repeat: no-repeat;
+    background-size: 130% auto;
+    opacity: 0.85;
+    transform: translateZ(60px);
+}
+
+.text-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    width: min(680px, 92%);
+    height: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    padding-top: 24px;
+    text-align: center;
+    text-shadow: 0 0 30px #111111;
+    user-select: text;
 }
 
 h1 {
-    margin: 0 0 16px;
-    color: #cc0000;
-    font-size: 64px;
+    margin: 0 0 -0.2em -0.2em;
+    padding-top: 0;
+    font-size: clamp(5rem, 14vw, 9rem);
+    font-weight: 900;
     line-height: 1;
 }
 
-.message {
-    margin: 0 0 12px;
-    font-size: 24px;
+p {
+    margin: 0 auto;
+    font-size: clamp(1.25rem, 2.4vw, 1.8rem);
     line-height: 1.35;
-}
-
-.hint {
-    margin: 0 0 28px;
-    color: #606060;
-    font-size: 16px;
-    line-height: 1.5;
 }
 
 .actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-}
-
-.button {
-    display: inline-flex;
-    min-height: 42px;
-    align-items: center;
     justify-content: center;
-    padding: 10px 16px;
-    border: 1px solid #d0d0d0;
-    border-radius: 8px;
-    color: #0f0f0f;
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
+    gap: 16px;
+    margin-top: 18px;
 }
 
-.button:hover,
-.button:focus {
-    border-color: #0f0f0f;
-}
-
-.primary {
-    background: #0f0f0f;
-    border-color: #0f0f0f;
+.back {
+    position: relative;
+    display: block;
+    width: min(230px, 100%);
+    min-height: 50px;
+    overflow: hidden;
+    padding: 11px 16px 14px;
+    border: 3px solid #ffffff;
+    border-radius: 3px;
     color: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 900;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
 }
 
-.secondary {
+.back:hover,
+.back:focus {
     background: #ffffff;
+    color: #000000;
+    text-shadow: none;
 }
 
-@media (max-width: 680px) {
-    .not-found {
-        align-items: start;
-        padding-top: 94px;
+@keyframes noise-3 {
+    0%,
+    3%,
+    5%,
+    42%,
+    44%,
+    100% {
+        opacity: 1;
+        transform: scaleY(1);
     }
 
-    .error-panel {
-        grid-template-columns: 1fr;
-        gap: 44px;
-        justify-items: center;
-        text-align: center;
-        transform: none;
+    4.3% {
+        opacity: 1;
+        transform: scaleY(4);
     }
 
-    .monkey {
-        width: min(240px, 78vw);
+    43% {
+        opacity: 1;
+        transform: scaleX(10) rotate(60deg);
+    }
+}
+
+@keyframes noise-1 {
+    0%,
+    20%,
+    40%,
+    60%,
+    70%,
+    90% {
+        opacity: 1;
     }
 
-    h1 {
-        font-size: 52px;
+    10% {
+        opacity: 0.1;
     }
 
-    .message {
-        font-size: 21px;
+    50% {
+        left: -6px;
+        opacity: 0.5;
+    }
+
+    80% {
+        opacity: 0.3;
+    }
+
+    100% {
+        left: 2px;
+        opacity: 0.6;
+    }
+}
+
+@media (max-width: 720px) {
+    .deloreanblue,
+    .deloreanred {
+        background-size: auto 100%;
+    }
+
+    .text-container {
+        padding-top: 34px;
     }
 
     .actions {
-        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .back {
+        width: min(280px, 100%);
     }
 }

@@ -8,22 +8,57 @@
 </head>
 <body>
 <main class="not-found">
-    <section class="error-panel" aria-labelledby="not-found-title">
-        <img
-            class="monkey"
-            src="{{ url_for('static', filename='images/nft_monkey.png') }}"
-            alt="Confused monkey"
-        >
-        <div class="copy">
-            <h1 id="not-found-title">404</h1>
-            <p class="message">This page is not available. Sorry about that.</p>
-            <p class="hint">Try heading home, or search YouTube for something better.</p>
-            <div class="actions">
-                <a class="button primary" href="{{ url_for('index') }}">Back home</a>
-                <a class="button secondary" href="https://www.youtube.com/results?search_query=funny+monkey+404" rel="noopener">Search YouTube</a>
-            </div>
+    <div id="container" aria-hidden="true">
+        <div class="deloreanblue">
+            <div class="deloreanred"></div>
+        </div>
+    </div>
+
+    <section class="text-container" aria-labelledby="not-found-title">
+        <h1 id="not-found-title">404</h1>
+        <p>Something went wrong.<br>The page was deleted or does not exist.</p>
+        <div class="actions">
+            <a class="back" href="{{ url_for('index') }}">Back home</a>
+            <a class="back" href="https://www.youtube.com/results?search_query=funny+back+to+the+future+404" rel="noopener">Search YouTube</a>
         </div>
     </section>
 </main>
+
+<script>
+    const container = document.getElementById("container");
+    const delorean = document.querySelector(".deloreanblue");
+    let demoCount = 0;
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    function moveDelorean(x, y) {
+        const rect = container.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const rotateY = ((x - centerX) * -0.3) * 0.03;
+        const rotateX = ((y - centerY) * 0.3) * 0.03;
+
+        delorean.style.transform = `perspective(1000px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+    }
+
+    document.body.addEventListener("mousemove", (event) => {
+        mouseX = event.pageX;
+        mouseY = event.pageY;
+        moveDelorean(mouseX, mouseY);
+    });
+
+    const intro = window.setInterval(() => {
+        if (demoCount >= 60) {
+            window.clearInterval(intro);
+            return;
+        }
+
+        mouseX += 2;
+        demoCount += 1;
+        moveDelorean(mouseX, mouseY);
+    }, 20);
+
+    moveDelorean(mouseX, mouseY);
+</script>
 </body>
 </html>
