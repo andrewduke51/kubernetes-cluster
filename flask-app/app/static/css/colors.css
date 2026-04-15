@@ -18,15 +18,16 @@ body {
     display: grid;
     min-height: 100vh;
     place-items: center;
-    padding: 32px 20px;
+    padding: 90px 20px 32px;
 }
 
 .error-panel {
     display: grid;
-    width: min(920px, 100%);
+    width: min(1020px, 100%);
     grid-template-columns: minmax(180px, 300px) 1fr;
     align-items: center;
-    gap: 42px;
+    gap: 86px;
+    transform: translateY(34px);
 }
 
 .monkey {
@@ -99,14 +100,15 @@ h1 {
 @media (max-width: 680px) {
     .not-found {
         align-items: start;
-        padding-top: 54px;
+        padding-top: 94px;
     }
 
     .error-panel {
         grid-template-columns: 1fr;
-        gap: 28px;
+        gap: 44px;
         justify-items: center;
         text-align: center;
+        transform: none;
     }
 
     .monkey {
