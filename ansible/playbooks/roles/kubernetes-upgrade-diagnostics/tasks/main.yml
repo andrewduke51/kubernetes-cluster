@@ -1,0 +1,68 @@
+---
+- name: Validate upgrade diagnostics inventory
+  ansible.builtin.assert:
+    that:
+      - groups[kubernetes_upgrade_diagnostics_control_plane_group] | default([]) | length == 1
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Check control-plane certificate expiry
+  ansible.builtin.command: kubeadm certs check-expiration
+  delegate_to: "{{ groups[kubernetes_upgrade_diagnostics_control_plane_group][0] }}"
+  register: kubernetes_upgrade_certificate_expiry
+  changed_when: false
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Report control-plane certificate expiry
+  ansible.builtin.debug:
+    var: kubernetes_upgrade_certificate_expiry.stdout_lines
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Inspect API server etcd client certificate metadata
+  ansible.builtin.command: >-
+    openssl x509 -in /etc/kubernetes/pki/apiserver-etcd-client.crt
+    -noout -subject -issuer -serial -dates -fingerprint
+  delegate_to: "{{ groups[kubernetes_upgrade_diagnostics_control_plane_group][0] }}"
+  register: kubernetes_upgrade_etcd_client_certificate
+  changed_when: false
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Report API server etcd client certificate metadata
+  ansible.builtin.debug:
+    var: kubernetes_upgrade_etcd_client_certificate.stdout_lines
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Inspect API server etcd TLS manifest arguments
+  ansible.builtin.shell: >-
+    grep -E -- '--etcd-(servers|cafile|certfile|keyfile)=' /etc/kubernetes/manifests/kube-apiserver.yaml
+  args:
+    executable: /bin/bash
+  delegate_to: "{{ groups[kubernetes_upgrade_diagnostics_control_plane_group][0] }}"
+  register: kubernetes_upgrade_etcd_manifest_arguments
+  changed_when: false
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Report API server etcd TLS manifest arguments
+  ansible.builtin.debug:
+    var: kubernetes_upgrade_etcd_manifest_arguments.stdout_lines
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Check the kubeadm upgrade plan with verbose diagnostics
+  ansible.builtin.command: kubeadm upgrade plan --v=5
+  delegate_to: "{{ groups[kubernetes_upgrade_diagnostics_control_plane_group][0] }}"
+  register: kubernetes_upgrade_plan_diagnostics
+  changed_when: false
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Report kubeadm upgrade-plan diagnostics
+  ansible.builtin.debug:
+    var: kubernetes_upgrade_plan_diagnostics.stdout_lines
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool

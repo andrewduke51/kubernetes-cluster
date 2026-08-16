@@ -60,15 +60,28 @@
   when: not kubernetes_upgrade_needed | bool
   run_once: true
 
+- name: Report that an upgrade is intentionally disabled
+  ansible.builtin.debug:
+    msg: >-
+      Kubernetes needs {{ kubernetes_version_minor }}.x, but upgrade actions
+      are disabled by kubernetes_upgrade_enabled.
+  when:
+    - kubernetes_upgrade_needed | bool
+    - not kubernetes_upgrade_enabled | default(false) | bool
+  run_once: true
+
 - name: Verify control-plane certificate prerequisites before upgrade
   ansible.builtin.include_tasks: preflight.yml
-  when: kubernetes_upgrade_needed | bool
+  when:
+    - kubernetes_upgrade_needed | bool
+    - kubernetes_upgrade_enabled | default(false) | bool
   run_once: true
 
 - name: Upgrade the control plane before worker nodes
   ansible.builtin.include_tasks: control-plane.yml
   when:
     - kubernetes_upgrade_needed | bool
+    - kubernetes_upgrade_enabled | default(false) | bool
     - >-
       kubernetes_upgrade_node_versions.results
       | selectattr('item', 'equalto', groups[kubernetes_upgrade_control_plane_group][0])
@@ -83,6 +96,7 @@
     loop_var: kubernetes_upgrade_worker
   when:
     - kubernetes_upgrade_needed | bool
+    - kubernetes_upgrade_enabled | default(false) | bool
     - >-
       kubernetes_upgrade_node_versions.results
       | selectattr('item', 'equalto', kubernetes_upgrade_worker)

@@ -3,3 +3,9 @@
 # Update this single value for the next supported one-minor-at-a-time upgrade.
 kubernetes_version_minor: "1.35"
 kubernetes_version_package: "1.35.7-1.1"
+
+# Keep the automatic upgrade disabled while recovering the failed control-plane
+# attempt. The diagnostics role still runs remotely on the master and emits the
+# evidence needed to repair it. Set this to true only for the retry.
+kubernetes_upgrade_enabled: false
+kubernetes_upgrade_diagnostics_enabled: true
