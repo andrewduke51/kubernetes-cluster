@@ -12,6 +12,7 @@
     - install-containerd
     - bootstrap-kubernetes
     - kubernetes-upgrade-diagnostics
+    - kubernetes-etcd-endpoint-repair
     - kubernetes-upgrade
 
   post_tasks:

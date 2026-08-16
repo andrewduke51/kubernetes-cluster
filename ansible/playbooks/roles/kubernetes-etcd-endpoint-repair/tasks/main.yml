@@ -1,0 +1,210 @@
+---
+- name: Validate etcd endpoint repair inventory
+  ansible.builtin.assert:
+    that:
+      - groups[kubernetes_etcd_endpoint_repair_control_plane_group] | default([]) | length == 1
+  run_once: true
+  when: kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+
+- name: Set control-plane and etcd endpoint facts
+  ansible.builtin.set_fact:
+    kubernetes_etcd_endpoint_repair_host: "{{ groups[kubernetes_etcd_endpoint_repair_control_plane_group][0] }}"
+    kubernetes_etcd_endpoint_repair_ip: "{{ hostvars[groups[kubernetes_etcd_endpoint_repair_control_plane_group][0]].ansible_host }}"
+  run_once: true
+  when: kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+
+- name: Ensure the inventory etcd endpoint belongs to the control-plane host
+  ansible.builtin.assert:
+    that:
+      - kubernetes_etcd_endpoint_repair_ip in hostvars[kubernetes_etcd_endpoint_repair_host].ansible_all_ipv4_addresses
+    fail_msg: >-
+      Refusing to replace etcd certificates: {{ kubernetes_etcd_endpoint_repair_ip }}
+      is not assigned to {{ kubernetes_etcd_endpoint_repair_host }}.
+  run_once: true
+  when: kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+
+- name: Determine whether the etcd server certificate matches the current endpoint
+  ansible.builtin.command: >-
+    openssl verify -verify_ip {{ kubernetes_etcd_endpoint_repair_ip }}
+    -CAfile {{ kubernetes_etcd_endpoint_repair_etcd_pki_dir }}/ca.crt
+    {{ kubernetes_etcd_endpoint_repair_etcd_pki_dir }}/server.crt
+  delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+  register: kubernetes_etcd_endpoint_repair_certificate_check
+  changed_when: false
+  failed_when: false
+  run_once: true
+  when: kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+
+- name: Determine whether etcd endpoint certificate repair is needed
+  ansible.builtin.set_fact:
+    kubernetes_etcd_endpoint_repair_needed: >-
+      {{ kubernetes_etcd_endpoint_repair_certificate_check.rc != 0 }}
+  run_once: true
+  when: kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+
+- name: Report that etcd endpoint certificates already match the current endpoint
+  ansible.builtin.debug:
+    msg: >-
+      etcd endpoint certificates already validate for
+      {{ kubernetes_etcd_endpoint_repair_ip }}; no repair was needed.
+  run_once: true
+  when:
+    - kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+    - not kubernetes_etcd_endpoint_repair_needed | bool
+
+- name: Create a timestamped backup directory for the current etcd certificates
+  ansible.builtin.command: >-
+    mktemp -d {{ kubernetes_etcd_endpoint_repair_etcd_pki_dir }}/pre-endpoint-repair.XXXXXX
+  delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+  register: kubernetes_etcd_endpoint_repair_backup_directory
+  changed_when: true
+  run_once: true
+  when:
+    - kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+    - kubernetes_etcd_endpoint_repair_needed | bool
+
+- name: Write a kubeadm configuration with the current control-plane address
+  ansible.builtin.copy:
+    dest: /etc/kubernetes/kubeadm-etcd-endpoint-repair.yaml
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      apiVersion: kubeadm.k8s.io/v1beta4
+      kind: InitConfiguration
+      localAPIEndpoint:
+        advertiseAddress: {{ kubernetes_etcd_endpoint_repair_ip }}
+        bindPort: 6443
+      nodeRegistration:
+        name: {{ kubernetes_etcd_endpoint_repair_host }}
+      ---
+      apiVersion: kubeadm.k8s.io/v1beta4
+      kind: ClusterConfiguration
+      certificatesDir: {{ kubernetes_etcd_endpoint_repair_pki_dir }}
+      etcd:
+        local:
+          dataDir: /var/lib/etcd
+  delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+  run_once: true
+  when:
+    - kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+    - kubernetes_etcd_endpoint_repair_needed | bool
+
+- name: Replace etcd endpoint certificates with the current address
+  block:
+    - name: Back up current etcd endpoint certificate files
+      ansible.builtin.copy:
+        src: "{{ kubernetes_etcd_endpoint_repair_etcd_pki_dir }}/{{ item }}"
+        dest: "{{ kubernetes_etcd_endpoint_repair_backup_directory.stdout }}/{{ item }}"
+        remote_src: true
+        owner: root
+        group: root
+        mode: preserve
+      loop:
+        - server.crt
+        - server.key
+        - peer.crt
+        - peer.key
+      delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+
+    - name: Remove stale etcd endpoint certificate files so kubeadm regenerates them
+      ansible.builtin.file:
+        path: "{{ kubernetes_etcd_endpoint_repair_etcd_pki_dir }}/{{ item }}"
+        state: absent
+      loop:
+        - server.crt
+        - server.key
+        - peer.crt
+        - peer.key
+      delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+
+    - name: Generate the etcd server certificate for the current endpoint
+      ansible.builtin.command: >-
+        kubeadm init phase certs etcd-server
+        --config /etc/kubernetes/kubeadm-etcd-endpoint-repair.yaml
+      delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+
+    - name: Generate the etcd peer certificate for the current endpoint
+      ansible.builtin.command: >-
+        kubeadm init phase certs etcd-peer
+        --config /etc/kubernetes/kubeadm-etcd-endpoint-repair.yaml
+      delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+
+  rescue:
+    - name: Restore etcd endpoint certificates from the backup
+      ansible.builtin.copy:
+        src: "{{ kubernetes_etcd_endpoint_repair_backup_directory.stdout }}/{{ item }}"
+        dest: "{{ kubernetes_etcd_endpoint_repair_etcd_pki_dir }}/{{ item }}"
+        remote_src: true
+        owner: root
+        group: root
+        mode: preserve
+      loop:
+        - server.crt
+        - server.key
+        - peer.crt
+        - peer.key
+      delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+
+    - name: Restart kubelet after restoring etcd endpoint certificates
+      ansible.builtin.systemd:
+        name: kubelet
+        state: restarted
+      delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+
+    - name: Stop after restoring the prior etcd endpoint certificates
+      ansible.builtin.fail:
+        msg: >-
+          etcd certificate regeneration failed; the prior certificate files were
+          restored from {{ kubernetes_etcd_endpoint_repair_backup_directory.stdout }}.
+
+  when:
+    - kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+    - kubernetes_etcd_endpoint_repair_needed | bool
+
+- name: Restart static control-plane pods to load the new etcd certificates
+  ansible.builtin.systemd:
+    name: kubelet
+    state: restarted
+  delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+  run_once: true
+  when:
+    - kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+    - kubernetes_etcd_endpoint_repair_needed | bool
+
+- name: Verify the regenerated etcd server certificate includes the current endpoint
+  ansible.builtin.command: >-
+    openssl verify -verify_ip {{ kubernetes_etcd_endpoint_repair_ip }}
+    -CAfile {{ kubernetes_etcd_endpoint_repair_etcd_pki_dir }}/ca.crt
+    {{ kubernetes_etcd_endpoint_repair_etcd_pki_dir }}/server.crt
+  delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+  changed_when: false
+  run_once: true
+  when:
+    - kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+    - kubernetes_etcd_endpoint_repair_needed | bool
+
+- name: Wait for the API server to become ready after the etcd certificate repair
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_etcd_endpoint_repair_kubeconfig }}
+    get --raw=/readyz
+  delegate_to: "{{ kubernetes_etcd_endpoint_repair_host }}"
+  register: kubernetes_etcd_endpoint_repair_ready
+  retries: 30
+  delay: 10
+  until: kubernetes_etcd_endpoint_repair_ready.rc == 0
+  changed_when: false
+  run_once: true
+  when:
+    - kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+    - kubernetes_etcd_endpoint_repair_needed | bool
+
+- name: Report the etcd endpoint certificate backup location
+  ansible.builtin.debug:
+    msg: >-
+      Repaired etcd certificates for {{ kubernetes_etcd_endpoint_repair_ip }}.
+      Previous files are backed up in {{ kubernetes_etcd_endpoint_repair_backup_directory.stdout }}.
+  run_once: true
+  when:
+    - kubernetes_etcd_endpoint_repair_enabled | default(false) | bool
+    - kubernetes_etcd_endpoint_repair_needed | bool

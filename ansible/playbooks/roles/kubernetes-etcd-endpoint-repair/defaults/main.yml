@@ -1,0 +1,7 @@
+---
+kubernetes_etcd_endpoint_repair_control_plane_group: master
+kubernetes_etcd_endpoint_repair_pki_dir: /etc/kubernetes/pki
+kubernetes_etcd_endpoint_repair_etcd_pki_dir: /etc/kubernetes/pki/etcd
+kubernetes_etcd_endpoint_repair_manifest: /etc/kubernetes/manifests/etcd.yaml
+kubernetes_etcd_endpoint_repair_kubeconfig: /etc/kubernetes/admin.conf
+kubernetes_etcd_endpoint_repair_ready_timeout: 5m

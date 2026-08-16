@@ -9,3 +9,7 @@ kubernetes_version_package: "1.35.7-1.1"
 kubernetes_upgrade_enabled: false
 kubernetes_upgrade_diagnostics_enabled: true
 kubernetes_upgrade_recovery_diagnostics_enabled: false
+
+# The etcd certificates predate the current control-plane address. Repair only
+# these local serving certificates before attempting the Kubernetes upgrade.
+kubernetes_etcd_endpoint_repair_enabled: true
