@@ -6,7 +6,7 @@ kubernetes_version_package: "1.35.7-1.1"
 
 # Keep automatic mutations disabled while investigating the failed control-plane
 # attempt. Diagnostics only inspect the master and do not change the cluster.
-kubernetes_upgrade_enabled: false
+kubernetes_upgrade_enabled: true
 kubernetes_upgrade_diagnostics_enabled: true
 kubernetes_upgrade_recovery_diagnostics_enabled: false
 
