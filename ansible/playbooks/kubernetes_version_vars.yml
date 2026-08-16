@@ -4,9 +4,8 @@
 kubernetes_version_minor: "1.35"
 kubernetes_version_package: "1.35.7-1.1"
 
-# Keep the automatic upgrade disabled while recovering the failed control-plane
-# attempt. The diagnostics role still runs remotely on the master and emits the
-# evidence needed to repair it. Set this to true only for the retry.
+# Keep automatic mutations disabled while investigating the failed control-plane
+# attempt. Diagnostics only inspect the master and do not change the cluster.
 kubernetes_upgrade_enabled: false
 kubernetes_upgrade_diagnostics_enabled: true
-kubernetes_upgrade_recovery_diagnostics_enabled: true
+kubernetes_upgrade_recovery_diagnostics_enabled: false

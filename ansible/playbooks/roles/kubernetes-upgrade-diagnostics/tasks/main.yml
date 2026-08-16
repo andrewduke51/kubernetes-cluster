@@ -36,6 +36,26 @@
   run_once: true
   when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
 
+- name: Inspect etcd serving and peer certificate SANs
+  ansible.builtin.command: >-
+    openssl x509 -in /etc/kubernetes/pki/etcd/{{ item }}.crt
+    -noout -subject -issuer -serial -dates -ext subjectAltName
+  loop:
+    - server
+    - peer
+  delegate_to: "{{ groups[kubernetes_upgrade_diagnostics_control_plane_group][0] }}"
+  register: kubernetes_upgrade_etcd_endpoint_certificates
+  changed_when: false
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Report etcd serving and peer certificate SANs
+  ansible.builtin.debug:
+    msg: "{{ item.item }} certificate: {{ item.stdout_lines }}"
+  loop: "{{ kubernetes_upgrade_etcd_endpoint_certificates.results }}"
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
 - name: Inspect API server etcd TLS manifest arguments
   ansible.builtin.shell: >-
     grep -E -- '--etcd-(servers|cafile|certfile|keyfile)=' /etc/kubernetes/manifests/kube-apiserver.yaml
