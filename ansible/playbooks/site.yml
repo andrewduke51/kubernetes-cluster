@@ -4,12 +4,13 @@
   become: true
   vars_files:
     - "../../local_files/ansible_local_vars.yml"
+    - "kubernetes_version_vars.yml"
   roles:
     - pub-key
     - update-linux
     - install-containerd
-    - install-kubernetes
-    - kubernetes-upgrade-v1.34
+    - bootstrap-kubernetes
+    - kubernetes-upgrade
 
   post_tasks:
     - name: Get kube config file

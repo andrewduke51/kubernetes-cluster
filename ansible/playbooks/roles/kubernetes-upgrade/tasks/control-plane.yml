@@ -28,10 +28,10 @@
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
   changed_when: false
 
-- name: Upgrade kubeadm to the latest {{ kubernetes_upgrade_target_minor }} patch
+- name: Install pinned kubeadm {{ kubernetes_version_package }} on the control plane
   ansible.builtin.apt:
-    name: kubeadm
-    state: latest
+    name: "kubeadm={{ kubernetes_version_package }}"
+    state: present
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
 
 - name: Hold kubeadm on the control plane
@@ -60,12 +60,12 @@
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
   changed_when: false
 
-- name: Upgrade kubelet and kubectl on the control plane
+- name: Install pinned kubelet and kubectl {{ kubernetes_version_package }} on the control plane
   ansible.builtin.apt:
     name:
-      - kubelet
-      - kubectl
-    state: latest
+      - "kubelet={{ kubernetes_version_package }}"
+      - "kubectl={{ kubernetes_version_package }}"
+    state: present
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
 
 - name: Hold kubelet and kubectl on the control plane

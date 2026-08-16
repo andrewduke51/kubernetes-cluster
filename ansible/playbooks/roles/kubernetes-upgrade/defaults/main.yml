@@ -1,8 +1,4 @@
 ---
-# Change both this role's directory/name and this value together for the next
-# minor release (for example, kubernetes-upgrade-v1.35 and "1.35").
-kubernetes_upgrade_target_minor: "1.34"
-
 kubernetes_upgrade_cluster_group: kubernetescluster
 kubernetes_upgrade_control_plane_group: master
 kubernetes_upgrade_kubeconfig: /etc/kubernetes/admin.conf

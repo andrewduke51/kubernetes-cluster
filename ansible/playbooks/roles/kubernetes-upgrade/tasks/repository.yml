@@ -6,26 +6,26 @@
     mode: "0755"
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
 
-- name: Install the Kubernetes {{ kubernetes_upgrade_target_minor }} repository key
+- name: Install the Kubernetes {{ kubernetes_version_minor }} repository key
   ansible.builtin.shell: |
     set -euo pipefail
-    curl -fsSL "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_upgrade_target_minor }}/deb/Release.key" \
+    curl -fsSL "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version_minor }}/deb/Release.key" \
       | gpg --dearmor --yes --output "{{ kubernetes_upgrade_keyring_path }}"
   args:
     executable: /bin/bash
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
   changed_when: false
 
-- name: Configure the Kubernetes {{ kubernetes_upgrade_target_minor }} APT repository
+- name: Configure the Kubernetes {{ kubernetes_version_minor }} APT repository
   ansible.builtin.apt_repository:
     repo: >-
       deb [signed-by={{ kubernetes_upgrade_keyring_path }}]
-      https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_upgrade_target_minor }}/deb/ /
+      https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version_minor }}/deb/ /
     state: present
     filename: "{{ kubernetes_upgrade_repo_file }}"
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
 
-- name: Refresh APT metadata for Kubernetes {{ kubernetes_upgrade_target_minor }}
+- name: Refresh APT metadata for Kubernetes {{ kubernetes_version_minor }}
   ansible.builtin.apt:
     update_cache: true
   delegate_to: "{{ kubernetes_upgrade_target_host }}"

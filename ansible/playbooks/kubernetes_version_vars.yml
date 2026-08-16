@@ -1,0 +1,5 @@
+---
+# The desired Kubernetes minor release for installation and upgrades.
+# Update this single value for the next supported one-minor-at-a-time upgrade.
+kubernetes_version_minor: "1.35"
+kubernetes_version_package: "1.35.7-1.1"

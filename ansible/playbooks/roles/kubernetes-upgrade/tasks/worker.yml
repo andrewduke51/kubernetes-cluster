@@ -28,10 +28,10 @@
   delegate_to: "{{ kubernetes_upgrade_worker }}"
   changed_when: false
 
-- name: Upgrade kubeadm on worker {{ kubernetes_upgrade_worker }}
+- name: Install pinned kubeadm {{ kubernetes_version_package }} on worker {{ kubernetes_upgrade_worker }}
   ansible.builtin.apt:
-    name: kubeadm
-    state: latest
+    name: "kubeadm={{ kubernetes_version_package }}"
+    state: present
   delegate_to: "{{ kubernetes_upgrade_worker }}"
 
 - name: Hold kubeadm on worker {{ kubernetes_upgrade_worker }}
@@ -48,12 +48,12 @@
   delegate_to: "{{ kubernetes_upgrade_worker }}"
   changed_when: false
 
-- name: Upgrade kubelet and kubectl on worker {{ kubernetes_upgrade_worker }}
+- name: Install pinned kubelet and kubectl {{ kubernetes_version_package }} on worker {{ kubernetes_upgrade_worker }}
   ansible.builtin.apt:
     name:
-      - kubelet
-      - kubectl
-    state: latest
+      - "kubelet={{ kubernetes_version_package }}"
+      - "kubectl={{ kubernetes_version_package }}"
+    state: present
   delegate_to: "{{ kubernetes_upgrade_worker }}"
 
 - name: Hold kubelet and kubectl on worker {{ kubernetes_upgrade_worker }}

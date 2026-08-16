@@ -19,7 +19,7 @@
   become: yes
   ansible.builtin.shell: |
     set -euo pipefail
-    curl -fsSL "https://pkgs.k8s.io/core:/stable:/v{{ k8s_minor }}/deb/Release.key" \
+    curl -fsSL "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version_minor }}/deb/Release.key" \
       | gpg --dearmor -o "{{ k8s_keyring_path }}"
   args:
     creates: "{{ k8s_keyring_path }}"
@@ -27,7 +27,7 @@
 - name: Add Kubernetes apt repo (pkgs.k8s.io)
   become: yes
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by={{ k8s_keyring_path }}] https://pkgs.k8s.io/core:/stable:/v{{ k8s_minor }}/deb/ /"
+    repo: "deb [signed-by={{ k8s_keyring_path }}] https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version_minor }}/deb/ /"
     state: present
     filename: "{{ k8s_repo_file }}"
 
