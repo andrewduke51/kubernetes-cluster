@@ -1,0 +1,75 @@
+---
+- name: Set recovery target facts
+  ansible.builtin.set_fact:
+    kubernetes_upgrade_recovery_master: "{{ groups[kubernetes_upgrade_diagnostics_control_plane_group][0] }}"
+    kubernetes_upgrade_recovery_version: "v{{ kubernetes_version_package.split('-')[0] }}"
+
+- name: Cordon the control plane for verbose recovery diagnostics
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf cordon
+    {{ kubernetes_upgrade_recovery_master }}
+  delegate_to: "{{ kubernetes_upgrade_recovery_master }}"
+  changed_when: true
+
+- name: Drain the control plane for verbose recovery diagnostics
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf drain
+    {{ kubernetes_upgrade_recovery_master }} --ignore-daemonsets --delete-emptydir-data
+    --force --disable-eviction --timeout=20m
+  delegate_to: "{{ kubernetes_upgrade_recovery_master }}"
+  changed_when: true
+
+- name: Run kubeadm upgrade with verbose diagnostics
+  ansible.builtin.command: >-
+    kubeadm upgrade apply --yes {{ kubernetes_upgrade_recovery_version }} --v=5
+  delegate_to: "{{ kubernetes_upgrade_recovery_master }}"
+  register: kubernetes_upgrade_recovery_apply
+  changed_when: true
+  failed_when: false
+
+- name: Report verbose kubeadm upgrade output
+  ansible.builtin.debug:
+    var: kubernetes_upgrade_recovery_apply
+
+- name: List kubeadm recovery artifacts
+  ansible.builtin.command: >-
+    find /etc/kubernetes/tmp -maxdepth 2 -type f -printf '%p\n'
+  delegate_to: "{{ kubernetes_upgrade_recovery_master }}"
+  register: kubernetes_upgrade_recovery_artifacts
+  changed_when: false
+  failed_when: false
+
+- name: Report kubeadm recovery artifacts
+  ansible.builtin.debug:
+    var: kubernetes_upgrade_recovery_artifacts.stdout_lines
+
+- name: Capture recent etcd container logs
+  ansible.builtin.shell: |
+    set -euo pipefail
+    etcd_container="$(crictl ps --name etcd -q | head -n1)"
+    test -n "${etcd_container}"
+    crictl logs --tail=200 "${etcd_container}"
+  args:
+    executable: /bin/bash
+  delegate_to: "{{ kubernetes_upgrade_recovery_master }}"
+  register: kubernetes_upgrade_recovery_etcd_logs
+  changed_when: false
+  failed_when: false
+
+- name: Report recent etcd container logs
+  ansible.builtin.debug:
+    var: kubernetes_upgrade_recovery_etcd_logs.stdout_lines
+
+- name: Uncordon the control plane after recovery diagnostics
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf uncordon
+    {{ kubernetes_upgrade_recovery_master }}
+  delegate_to: "{{ kubernetes_upgrade_recovery_master }}"
+  changed_when: true
+
+- name: Fail after collecting recovery diagnostics when kubeadm failed
+  ansible.builtin.fail:
+    msg: >-
+      kubeadm upgrade apply {{ kubernetes_upgrade_recovery_version }} failed;
+      see the verbose recovery diagnostics above.
+  when: kubernetes_upgrade_recovery_apply.rc != 0

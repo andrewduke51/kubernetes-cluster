@@ -9,3 +9,4 @@ kubernetes_version_package: "1.35.7-1.1"
 # evidence needed to repair it. Set this to true only for the retry.
 kubernetes_upgrade_enabled: false
 kubernetes_upgrade_diagnostics_enabled: true
+kubernetes_upgrade_recovery_diagnostics_enabled: true

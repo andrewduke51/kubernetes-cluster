@@ -66,3 +66,8 @@
     var: kubernetes_upgrade_plan_diagnostics.stdout_lines
   run_once: true
   when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Run verbose control-plane recovery diagnostics
+  ansible.builtin.include_tasks: recovery.yml
+  when: kubernetes_upgrade_recovery_diagnostics_enabled | default(false) | bool
+  run_once: true
