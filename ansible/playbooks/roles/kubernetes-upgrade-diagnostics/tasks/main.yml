@@ -78,6 +78,7 @@
   delegate_to: "{{ groups[kubernetes_upgrade_diagnostics_control_plane_group][0] }}"
   register: kubernetes_upgrade_plan_diagnostics
   changed_when: false
+  failed_when: false
   run_once: true
   when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
 
@@ -104,6 +105,16 @@
     var: kubernetes_upgrade_kubelet_diagnostics.stdout_lines
   run_once: true
   when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Stop after recording an unhealthy control-plane diagnostic
+  ansible.builtin.fail:
+    msg: >-
+      kubeadm upgrade plan reports an unhealthy control plane. Kubelet service
+      and journal diagnostics were collected immediately before this failure.
+  when:
+    - kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+    - kubernetes_upgrade_plan_diagnostics.rc != 0
+  run_once: true
 
 - name: Run verbose control-plane recovery diagnostics
   ansible.builtin.include_tasks: recovery.yml
