@@ -70,28 +70,54 @@
   register: kubernetes_upgrade_live_cluster_configuration
   changed_when: false
 
-- name: Write kubeadm upgrade configuration with the current control-plane endpoint
+- name: Add the control-plane inventory IP to kubeadm API server certificate SANs
+  ansible.builtin.set_fact:
+    kubernetes_upgrade_cluster_configuration_with_endpoint: >-
+      {{ (kubernetes_upgrade_live_cluster_configuration.stdout | from_yaml)
+         | combine(
+             {
+               'apiServer': (
+                 (kubernetes_upgrade_live_cluster_configuration.stdout | from_yaml).apiServer
+                 | default({})
+                 | combine(
+                     {
+                       'certSANs': (
+                         ((kubernetes_upgrade_live_cluster_configuration.stdout | from_yaml).apiServer
+                          | default({})).certSANs
+                         | default([])
+                         + [hostvars[kubernetes_upgrade_target_host].ansible_host]
+                       ) | unique
+                     }
+                   )
+               )
+             },
+             recursive=True
+           ) }}
+
+- name: Write the kubeadm ClusterConfiguration with the control-plane endpoint SAN
   ansible.builtin.copy:
-    dest: "{{ kubernetes_upgrade_kubeadm_config }}"
+    dest: /etc/kubernetes/kubeadm-cluster-configuration.yaml
     owner: root
     group: root
     mode: "0600"
-    content: |
-      apiVersion: kubeadm.k8s.io/v1beta4
-      kind: InitConfiguration
-      localAPIEndpoint:
-        advertiseAddress: {{ hostvars[kubernetes_upgrade_target_host].ansible_host }}
-        bindPort: 6443
-      nodeRegistration:
-        name: {{ kubernetes_upgrade_target_host }}
-      ---
-      {{ kubernetes_upgrade_live_cluster_configuration.stdout
-         | regex_replace('(?m)^kubernetesVersion:.*$', 'kubernetesVersion: v' ~ kubernetes_version_package.split('-')[0]) }}
+    content: "{{ kubernetes_upgrade_cluster_configuration_with_endpoint | to_nice_yaml(indent=2) }}"
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
+
+- name: Persist the control-plane endpoint SAN in kubeadm configuration
+  ansible.builtin.shell: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} -n kube-system
+    create configmap kubeadm-config
+    --from-file=ClusterConfiguration=/etc/kubernetes/kubeadm-cluster-configuration.yaml
+    --dry-run=client -o yaml
+    | kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} apply -f -
+  args:
+    executable: /bin/bash
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  changed_when: true
 
 - name: Apply the control-plane upgrade
   ansible.builtin.command: >-
-    kubeadm upgrade apply --yes --config {{ kubernetes_upgrade_kubeadm_config }}
+    kubeadm upgrade apply --yes {{ kubernetes_upgrade_kubeadm_version.stdout }}
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
 
 - name: Unhold kubelet and kubectl on the control plane
