@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: kubernetescluster
   tasks:
   - name: Ansible Playbook ping
     ansible.builtin.ping:
