@@ -21,6 +21,23 @@
   delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
   changed_when: false
 
+- name: Verify the API server certificate includes the control-plane inventory IP
+  ansible.builtin.command: >-
+    openssl verify
+    -verify_ip {{ hostvars[groups[kubernetes_upgrade_control_plane_group][0]].ansible_host }}
+    -CAfile /etc/kubernetes/pki/ca.crt
+    /etc/kubernetes/pki/apiserver.crt
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  changed_when: false
+
+- name: Verify the API server certificate includes the stable endpoint DNS name
+  ansible.builtin.command: >-
+    openssl verify -verify_hostname {{ kubernetes_upgrade_api_endpoint_dns }}
+    -CAfile /etc/kubernetes/pki/ca.crt
+    /etc/kubernetes/pki/apiserver.crt
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  changed_when: false
+
 - name: Check control-plane certificate expiry before upgrade
   ansible.builtin.command: kubeadm certs check-expiration
   delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"

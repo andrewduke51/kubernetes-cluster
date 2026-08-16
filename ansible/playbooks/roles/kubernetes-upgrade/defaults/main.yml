@@ -2,6 +2,8 @@
 kubernetes_upgrade_cluster_group: kubernetescluster
 kubernetes_upgrade_control_plane_group: master
 kubernetes_upgrade_kubeconfig: /etc/kubernetes/admin.conf
+kubernetes_upgrade_kubeadm_config: /etc/kubernetes/kubeadm-upgrade.yaml
+kubernetes_upgrade_api_endpoint_dns: kube-api.local
 kubernetes_upgrade_keyring_path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 kubernetes_upgrade_repo_file: kubernetes
 

@@ -3,6 +3,17 @@
   ansible.builtin.set_fact:
     kubernetes_upgrade_target_host: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
 
+- name: Ensure the control-plane inventory IP is assigned to its host
+  ansible.builtin.assert:
+    that:
+      - >-
+        hostvars[kubernetes_upgrade_target_host].ansible_host
+        in hostvars[kubernetes_upgrade_target_host].ansible_all_ipv4_addresses
+    fail_msg: >-
+      Refusing the upgrade because the inventory control-plane IP
+      {{ hostvars[kubernetes_upgrade_target_host].ansible_host }} is not assigned
+      to {{ kubernetes_upgrade_target_host }}.
+
 - name: Cordon the control-plane node
   ansible.builtin.command: >-
     kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} cordon
@@ -50,9 +61,37 @@
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
   changed_when: false
 
+- name: Read the live kubeadm ClusterConfiguration
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }}
+    -n kube-system get configmap kubeadm-config
+    -o jsonpath={.data.ClusterConfiguration}
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  register: kubernetes_upgrade_live_cluster_configuration
+  changed_when: false
+
+- name: Write kubeadm upgrade configuration with the current control-plane endpoint
+  ansible.builtin.copy:
+    dest: "{{ kubernetes_upgrade_kubeadm_config }}"
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      apiVersion: kubeadm.k8s.io/v1beta4
+      kind: InitConfiguration
+      localAPIEndpoint:
+        advertiseAddress: {{ hostvars[kubernetes_upgrade_target_host].ansible_host }}
+        bindPort: 6443
+      nodeRegistration:
+        name: {{ kubernetes_upgrade_target_host }}
+      ---
+      {{ kubernetes_upgrade_live_cluster_configuration.stdout
+         | regex_replace('(?m)^kubernetesVersion:.*$', 'kubernetesVersion: v' ~ kubernetes_version_package.split('-')[0]) }}
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+
 - name: Apply the control-plane upgrade
   ansible.builtin.command: >-
-    kubeadm upgrade apply --yes {{ kubernetes_upgrade_kubeadm_version.stdout }}
+    kubeadm upgrade apply --yes --config {{ kubernetes_upgrade_kubeadm_config }}
   delegate_to: "{{ kubernetes_upgrade_target_host }}"
 
 - name: Unhold kubelet and kubectl on the control plane
