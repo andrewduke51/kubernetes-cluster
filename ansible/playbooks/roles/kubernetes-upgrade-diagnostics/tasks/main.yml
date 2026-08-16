@@ -87,6 +87,24 @@
   run_once: true
   when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
 
+- name: Inspect master kubelet service after a control-plane upgrade
+  ansible.builtin.shell: |
+    systemctl status kubelet --no-pager --full || true
+    journalctl -u kubelet --no-pager -n 200 || true
+  args:
+    executable: /bin/bash
+  delegate_to: "{{ groups[kubernetes_upgrade_diagnostics_control_plane_group][0] }}"
+  register: kubernetes_upgrade_kubelet_diagnostics
+  changed_when: false
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
+- name: Report master kubelet diagnostics
+  ansible.builtin.debug:
+    var: kubernetes_upgrade_kubelet_diagnostics.stdout_lines
+  run_once: true
+  when: kubernetes_upgrade_diagnostics_enabled | default(false) | bool
+
 - name: Run verbose control-plane recovery diagnostics
   ansible.builtin.include_tasks: recovery.yml
   when: kubernetes_upgrade_recovery_diagnostics_enabled | default(false) | bool
