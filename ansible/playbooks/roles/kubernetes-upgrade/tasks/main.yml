@@ -20,6 +20,19 @@
     kubernetes_upgrade_previous_minor: "{{ kubernetes_version_minor.split('.')[0] }}.{{ (kubernetes_version_minor.split('.')[1] | int) - 1 }}"
   run_once: true
 
+- name: Read Kubernetes node versions from the API server
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} get nodes
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  register: kubernetes_upgrade_api_node_versions
+  changed_when: false
+  run_once: true
+
+- name: Report Kubernetes node versions from the API server
+  ansible.builtin.debug:
+    var: kubernetes_upgrade_api_node_versions.stdout_lines
+  run_once: true
+
 - name: Read kubelet version from every cluster node
   ansible.builtin.command: kubelet --version
   delegate_to: "{{ item }}"
@@ -28,28 +41,29 @@
   changed_when: false
   run_once: true
 
-- name: Require a one-minor-at-a-time upgrade path
-  ansible.builtin.assert:
-    that:
-      - >-
-        kubernetes_upgrade_node_versions.results
-        | rejectattr('stdout', 'search',
-            'Kubernetes v(' ~ kubernetes_version_minor ~ '|'
-            ~ kubernetes_upgrade_previous_minor ~ ')\.')
-        | list | length == 0
-    fail_msg: >-
-      Every node must run Kubernetes {{ kubernetes_version_minor }}.x
-      already, or the immediately preceding minor
-      ({{ kubernetes_upgrade_previous_minor }}.x). Do not skip minor releases.
+- name: Determine whether every node already matches the requested minor
+  ansible.builtin.set_fact:
+    kubernetes_upgrade_already_current: >-
+      {{ kubernetes_upgrade_node_versions.results
+         | rejectattr('stdout', 'search',
+             'Kubernetes v' ~ kubernetes_version_minor ~ '\.')
+         | list | length == 0 }}
   run_once: true
 
-- name: Determine whether any node needs this minor upgrade
+- name: Determine whether every node is exactly one minor behind the requested version
   ansible.builtin.set_fact:
     kubernetes_upgrade_needed: >-
       {{ kubernetes_upgrade_node_versions.results
          | rejectattr('stdout', 'search',
-             'Kubernetes v' ~ kubernetes_version_minor ~ '\.')
-         | list | length > 0 }}
+             'Kubernetes v' ~ kubernetes_upgrade_previous_minor ~ '\.')
+         | list | length == 0 }}
+  run_once: true
+
+- name: Determine whether the requested version is not a safe automatic upgrade
+  ansible.builtin.set_fact:
+    kubernetes_upgrade_unsupported_state: >-
+      {{ not kubernetes_upgrade_already_current | bool
+         and not kubernetes_upgrade_needed | bool }}
   run_once: true
 
 - name: Report that the cluster already matches the target minor
@@ -57,31 +71,29 @@
     msg: >-
       Kubernetes is already {{ kubernetes_version_minor }}.x on every
       node; no upgrade actions were taken.
-  when: not kubernetes_upgrade_needed | bool
+  when: kubernetes_upgrade_already_current | bool
   run_once: true
 
-- name: Report that an upgrade is intentionally disabled
+- name: Report that the requested version is not a safe automatic upgrade
   ansible.builtin.debug:
     msg: >-
-      Kubernetes needs {{ kubernetes_version_minor }}.x, but upgrade actions
-      are disabled by kubernetes_upgrade_enabled.
-  when:
-    - kubernetes_upgrade_needed | bool
-    - not kubernetes_upgrade_enabled | default(false) | bool
+      No upgrade actions were taken. Every node must be either already on
+      {{ kubernetes_version_minor }}.x, or all nodes must be exactly one minor
+      behind on {{ kubernetes_upgrade_previous_minor }}.x. This protects against
+      downgrades, skipped minor versions, and mixed-version clusters.
+  when: kubernetes_upgrade_unsupported_state | bool
   run_once: true
 
 - name: Verify control-plane certificate prerequisites before upgrade
   ansible.builtin.include_tasks: preflight.yml
   when:
     - kubernetes_upgrade_needed | bool
-    - kubernetes_upgrade_enabled | default(false) | bool
   run_once: true
 
 - name: Upgrade the control plane before worker nodes
   ansible.builtin.include_tasks: control-plane.yml
   when:
     - kubernetes_upgrade_needed | bool
-    - kubernetes_upgrade_enabled | default(false) | bool
     - >-
       kubernetes_upgrade_node_versions.results
       | selectattr('item', 'equalto', groups[kubernetes_upgrade_control_plane_group][0])
@@ -96,7 +108,6 @@
     loop_var: kubernetes_upgrade_worker
   when:
     - kubernetes_upgrade_needed | bool
-    - kubernetes_upgrade_enabled | default(false) | bool
     - >-
       kubernetes_upgrade_node_versions.results
       | selectattr('item', 'equalto', kubernetes_upgrade_worker)

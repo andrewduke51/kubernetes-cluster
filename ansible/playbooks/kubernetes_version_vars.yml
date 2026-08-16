@@ -1,12 +1,9 @@
 ---
 # The desired Kubernetes minor release for installation and upgrades.
 # Update this single value for the next supported one-minor-at-a-time upgrade.
-kubernetes_version_minor: "1.35"
-kubernetes_version_package: "1.35.7-1.1"
+kubernetes_version_minor: "1.36"
+kubernetes_version_package: "1.36.3-1.1"
 
-# Keep automatic mutations disabled while investigating the failed control-plane
-# attempt. Diagnostics only inspect the master and do not change the cluster.
-kubernetes_upgrade_enabled: false
 kubernetes_upgrade_diagnostics_enabled: true
 kubernetes_upgrade_recovery_diagnostics_enabled: false
 
