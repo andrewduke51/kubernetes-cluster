@@ -60,6 +60,11 @@
   when: not kubernetes_upgrade_needed | bool
   run_once: true
 
+- name: Verify control-plane certificate prerequisites before upgrade
+  ansible.builtin.include_tasks: preflight.yml
+  when: kubernetes_upgrade_needed | bool
+  run_once: true
+
 - name: Upgrade the control plane before worker nodes
   ansible.builtin.include_tasks: control-plane.yml
   when:

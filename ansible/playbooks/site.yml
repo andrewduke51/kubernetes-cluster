@@ -2,6 +2,7 @@
 ---
 - hosts: kubernetescluster
   become: true
+  any_errors_fatal: true
   vars_files:
     - "../../local_files/ansible_local_vars.yml"
     - "kubernetes_version_vars.yml"

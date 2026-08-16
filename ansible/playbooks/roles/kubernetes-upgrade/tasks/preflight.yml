@@ -1,0 +1,27 @@
+---
+# kubeadm uses this CA key to renew apiserver-etcd-client.crt during an
+# upgrade. A key that does not match the installed etcd CA certificate makes
+# etcd reject the renewed client certificate and the control-plane upgrade
+# cannot succeed.
+- name: Verify the etcd CA private key matches its certificate
+  ansible.builtin.shell: |
+    set -euo pipefail
+    certificate_key="$(openssl x509 -in /etc/kubernetes/pki/etcd/ca.crt -pubkey -noout | openssl pkey -pubin -outform DER | sha256sum | awk '{print $1}')"
+    private_key="$(openssl pkey -in /etc/kubernetes/pki/etcd/ca.key -pubout -outform DER | sha256sum | awk '{print $1}')"
+    test "${certificate_key}" = "${private_key}"
+  args:
+    executable: /bin/bash
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  changed_when: false
+
+- name: Verify the current API server etcd client certificate chain
+  ansible.builtin.command: >-
+    openssl verify -CAfile /etc/kubernetes/pki/etcd/ca.crt
+    /etc/kubernetes/pki/apiserver-etcd-client.crt
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  changed_when: false
+
+- name: Check control-plane certificate expiry before upgrade
+  ansible.builtin.command: kubeadm certs check-expiration
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  changed_when: false
