@@ -1,0 +1,82 @@
+---
+- name: Validate Kubernetes upgrade inventory groups
+  ansible.builtin.assert:
+    that:
+      - groups[kubernetes_upgrade_cluster_group] | default([]) | length > 0
+      - groups[kubernetes_upgrade_control_plane_group] | default([]) | length == 1
+      - groups[kubernetes_upgrade_control_plane_group][0] in groups[kubernetes_upgrade_cluster_group]
+    fail_msg: >-
+      The upgrade role requires exactly one control-plane host in the
+      '{{ kubernetes_upgrade_control_plane_group }}' group and all nodes in
+      '{{ kubernetes_upgrade_cluster_group }}'.
+  run_once: true
+
+- name: Derive the only supported source minor version
+  ansible.builtin.set_fact:
+    kubernetes_upgrade_previous_minor: "{{ kubernetes_upgrade_target_minor.split('.')[0] }}.{{ (kubernetes_upgrade_target_minor.split('.')[1] | int) - 1 }}"
+  run_once: true
+
+- name: Read kubelet version from every cluster node
+  ansible.builtin.command: kubelet --version
+  delegate_to: "{{ item }}"
+  loop: "{{ groups[kubernetes_upgrade_cluster_group] }}"
+  register: kubernetes_upgrade_node_versions
+  changed_when: false
+  run_once: true
+
+- name: Require a one-minor-at-a-time upgrade path
+  ansible.builtin.assert:
+    that:
+      - >-
+        kubernetes_upgrade_node_versions.results
+        | rejectattr('stdout', 'search',
+            'Kubernetes v(' ~ kubernetes_upgrade_target_minor ~ '|'
+            ~ kubernetes_upgrade_previous_minor ~ ')\.')
+        | list | length == 0
+    fail_msg: >-
+      Every node must run Kubernetes {{ kubernetes_upgrade_target_minor }}.x
+      already, or the immediately preceding minor
+      ({{ kubernetes_upgrade_previous_minor }}.x). Do not skip minor releases.
+  run_once: true
+
+- name: Determine whether any node needs this minor upgrade
+  ansible.builtin.set_fact:
+    kubernetes_upgrade_needed: >-
+      {{ kubernetes_upgrade_node_versions.results
+         | rejectattr('stdout', 'search',
+             'Kubernetes v' ~ kubernetes_upgrade_target_minor ~ '\.')
+         | list | length > 0 }}
+  run_once: true
+
+- name: Report that the cluster already matches the target minor
+  ansible.builtin.debug:
+    msg: >-
+      Kubernetes is already {{ kubernetes_upgrade_target_minor }}.x on every
+      node; no upgrade actions were taken.
+  when: not kubernetes_upgrade_needed | bool
+  run_once: true
+
+- name: Upgrade the control plane before worker nodes
+  ansible.builtin.include_tasks: control-plane.yml
+  when:
+    - kubernetes_upgrade_needed | bool
+    - >-
+      kubernetes_upgrade_node_versions.results
+      | selectattr('item', 'equalto', groups[kubernetes_upgrade_control_plane_group][0])
+      | map(attribute='stdout') | first
+      is not search('Kubernetes v' ~ kubernetes_upgrade_target_minor ~ '\.')
+  run_once: true
+
+- name: Upgrade worker nodes serially
+  ansible.builtin.include_tasks: worker.yml
+  loop: "{{ groups[kubernetes_upgrade_cluster_group] | reject('in', groups[kubernetes_upgrade_control_plane_group]) | list }}"
+  loop_control:
+    loop_var: kubernetes_upgrade_worker
+  when:
+    - kubernetes_upgrade_needed | bool
+    - >-
+      kubernetes_upgrade_node_versions.results
+      | selectattr('item', 'equalto', kubernetes_upgrade_worker)
+      | map(attribute='stdout') | first
+      is not search('Kubernetes v' ~ kubernetes_upgrade_target_minor ~ '\.')
+  run_once: true

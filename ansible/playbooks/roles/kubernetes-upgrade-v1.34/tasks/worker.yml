@@ -1,0 +1,84 @@
+---
+- name: Cordon worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} cordon
+    {{ kubernetes_upgrade_worker }}
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  changed_when: true
+
+- name: Drain worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} drain
+    {{ kubernetes_upgrade_worker }} --ignore-daemonsets --delete-emptydir-data
+    --timeout={{ kubernetes_upgrade_drain_timeout }}
+    {{ '--force' if kubernetes_upgrade_drain_force | bool else '' }}
+    {{ '--disable-eviction' if kubernetes_upgrade_drain_disable_eviction | bool else '' }}
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  changed_when: true
+
+- name: Set the worker package target
+  ansible.builtin.set_fact:
+    kubernetes_upgrade_target_host: "{{ kubernetes_upgrade_worker }}"
+
+- name: Configure the target Kubernetes repository on worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.include_tasks: repository.yml
+
+- name: Unhold kubeadm on worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.command: apt-mark unhold kubeadm
+  delegate_to: "{{ kubernetes_upgrade_worker }}"
+  changed_when: false
+
+- name: Upgrade kubeadm on worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.apt:
+    name: kubeadm
+    state: latest
+  delegate_to: "{{ kubernetes_upgrade_worker }}"
+
+- name: Hold kubeadm on worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.command: apt-mark hold kubeadm
+  delegate_to: "{{ kubernetes_upgrade_worker }}"
+  changed_when: false
+
+- name: Upgrade node components on worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.command: kubeadm upgrade node
+  delegate_to: "{{ kubernetes_upgrade_worker }}"
+
+- name: Unhold kubelet and kubectl on worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.command: apt-mark unhold kubelet kubectl
+  delegate_to: "{{ kubernetes_upgrade_worker }}"
+  changed_when: false
+
+- name: Upgrade kubelet and kubectl on worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.apt:
+    name:
+      - kubelet
+      - kubectl
+    state: latest
+  delegate_to: "{{ kubernetes_upgrade_worker }}"
+
+- name: Hold kubelet and kubectl on worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.command: apt-mark hold kubelet kubectl
+  delegate_to: "{{ kubernetes_upgrade_worker }}"
+  changed_when: false
+
+- name: Restart kubelet on worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.systemd:
+    name: kubelet
+    state: restarted
+    daemon_reload: true
+  delegate_to: "{{ kubernetes_upgrade_worker }}"
+
+- name: Wait for worker {{ kubernetes_upgrade_worker }} to become Ready
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} wait
+    --for=condition=Ready node/{{ kubernetes_upgrade_worker }}
+    --timeout={{ kubernetes_upgrade_ready_timeout }}
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  changed_when: false
+
+- name: Uncordon worker {{ kubernetes_upgrade_worker }}
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} uncordon
+    {{ kubernetes_upgrade_worker }}
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  changed_when: true

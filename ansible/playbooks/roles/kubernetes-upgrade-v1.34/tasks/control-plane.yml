@@ -1,0 +1,96 @@
+---
+- name: Set the control-plane upgrade host
+  ansible.builtin.set_fact:
+    kubernetes_upgrade_target_host: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+
+- name: Cordon the control-plane node
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} cordon
+    {{ kubernetes_upgrade_target_host }}
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  changed_when: true
+
+- name: Drain the control-plane node
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} drain
+    {{ kubernetes_upgrade_target_host }} --ignore-daemonsets --delete-emptydir-data
+    --timeout={{ kubernetes_upgrade_drain_timeout }}
+    {{ '--force' if kubernetes_upgrade_drain_force | bool else '' }}
+    {{ '--disable-eviction' if kubernetes_upgrade_drain_disable_eviction | bool else '' }}
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  changed_when: true
+
+- name: Configure the target Kubernetes repository on the control plane
+  ansible.builtin.include_tasks: repository.yml
+
+- name: Unhold kubeadm on the control plane
+  ansible.builtin.command: apt-mark unhold kubeadm
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  changed_when: false
+
+- name: Upgrade kubeadm to the latest {{ kubernetes_upgrade_target_minor }} patch
+  ansible.builtin.apt:
+    name: kubeadm
+    state: latest
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+
+- name: Hold kubeadm on the control plane
+  ansible.builtin.command: apt-mark hold kubeadm
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  changed_when: false
+
+- name: Read the installed kubeadm version
+  ansible.builtin.command: kubeadm version -o short
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  register: kubernetes_upgrade_kubeadm_version
+  changed_when: false
+
+- name: Check the control-plane upgrade plan
+  ansible.builtin.command: kubeadm upgrade plan
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  changed_when: false
+
+- name: Apply the control-plane upgrade
+  ansible.builtin.command: >-
+    kubeadm upgrade apply --yes {{ kubernetes_upgrade_kubeadm_version.stdout }}
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+
+- name: Unhold kubelet and kubectl on the control plane
+  ansible.builtin.command: apt-mark unhold kubelet kubectl
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  changed_when: false
+
+- name: Upgrade kubelet and kubectl on the control plane
+  ansible.builtin.apt:
+    name:
+      - kubelet
+      - kubectl
+    state: latest
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+
+- name: Hold kubelet and kubectl on the control plane
+  ansible.builtin.command: apt-mark hold kubelet kubectl
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  changed_when: false
+
+- name: Restart kubelet on the control plane
+  ansible.builtin.systemd:
+    name: kubelet
+    state: restarted
+    daemon_reload: true
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+
+- name: Wait for the control-plane node to become Ready
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} wait
+    --for=condition=Ready node/{{ kubernetes_upgrade_target_host }}
+    --timeout={{ kubernetes_upgrade_ready_timeout }}
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  changed_when: false
+
+- name: Uncordon the control-plane node
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} uncordon
+    {{ kubernetes_upgrade_target_host }}
+  delegate_to: "{{ kubernetes_upgrade_target_host }}"
+  changed_when: true

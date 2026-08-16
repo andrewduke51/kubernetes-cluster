@@ -1,14 +1,15 @@
 # ansible-playbook -i local_files/inventory ansible/playbooks/site.yml
 ---
-- hosts: all
+- hosts: kubernetescluster
   become: true
   vars_files:
     - "../../local_files/ansible_local_vars.yml"
   roles:
-    - { role: pub-key, when: "'kubernetescluster' in group_names" }
-    - { role: update-linux, when: "'kubernetescluster' in group_names" }
-    - { role: install-containerd, when: "'kubernetescluster' in group_names" }
-    - { role: install-kubernetes, when: "'kubernetescluster' in group_names" }
+    - pub-key
+    - update-linux
+    - install-containerd
+    - install-kubernetes
+    - kubernetes-upgrade-v1.34
 
   post_tasks:
     - name: Get kube config file
