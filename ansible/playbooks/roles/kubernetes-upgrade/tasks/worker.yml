@@ -1,4 +1,14 @@
 ---
+- name: Wait for the control-plane admin kubeconfig to regain node permissions
+  ansible.builtin.command: >-
+    kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} auth can-i get nodes
+  delegate_to: "{{ groups[kubernetes_upgrade_control_plane_group][0] }}"
+  register: kubernetes_upgrade_worker_authorization
+  retries: 30
+  delay: 5
+  until: kubernetes_upgrade_worker_authorization.stdout | trim == 'yes'
+  changed_when: false
+
 - name: Cordon worker {{ kubernetes_upgrade_worker }}
   ansible.builtin.command: >-
     kubectl --kubeconfig {{ kubernetes_upgrade_kubeconfig }} cordon

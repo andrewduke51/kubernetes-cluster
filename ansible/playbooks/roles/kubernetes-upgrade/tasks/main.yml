@@ -52,11 +52,42 @@
 
 - name: Determine whether every node is exactly one minor behind the requested version
   ansible.builtin.set_fact:
-    kubernetes_upgrade_needed: >-
+    kubernetes_upgrade_all_nodes_one_minor_behind: >-
       {{ kubernetes_upgrade_node_versions.results
          | rejectattr('stdout', 'search',
              'Kubernetes v' ~ kubernetes_upgrade_previous_minor ~ '\.')
          | list | length == 0 }}
+  run_once: true
+
+- name: Determine whether worker upgrades can safely resume after a control-plane upgrade
+  ansible.builtin.set_fact:
+    kubernetes_upgrade_resume_workers: >-
+      {{
+        (kubernetes_upgrade_node_versions.results
+         | selectattr('item', 'equalto', groups[kubernetes_upgrade_control_plane_group][0])
+         | map(attribute='stdout') | first
+         is search('Kubernetes v' ~ kubernetes_version_minor ~ '\.'))
+        and
+        (kubernetes_upgrade_node_versions.results
+         | rejectattr('item', 'equalto', groups[kubernetes_upgrade_control_plane_group][0])
+         | rejectattr('stdout', 'search',
+             'Kubernetes v(' ~ kubernetes_version_minor ~ '|'
+             ~ kubernetes_upgrade_previous_minor ~ ')\.')
+         | list | length == 0)
+        and
+        (kubernetes_upgrade_node_versions.results
+         | rejectattr('item', 'equalto', groups[kubernetes_upgrade_control_plane_group][0])
+         | selectattr('stdout', 'search',
+             'Kubernetes v' ~ kubernetes_upgrade_previous_minor ~ '\.')
+         | list | length > 0)
+      }}
+  run_once: true
+
+- name: Determine whether an upgrade or safe worker resume is needed
+  ansible.builtin.set_fact:
+    kubernetes_upgrade_needed: >-
+      {{ kubernetes_upgrade_all_nodes_one_minor_behind | bool
+         or kubernetes_upgrade_resume_workers | bool }}
   run_once: true
 
 - name: Determine whether the requested version is not a safe automatic upgrade
@@ -79,8 +110,10 @@
     msg: >-
       No upgrade actions were taken. Every node must be either already on
       {{ kubernetes_version_minor }}.x, or all nodes must be exactly one minor
-      behind on {{ kubernetes_upgrade_previous_minor }}.x. This protects against
-      downgrades, skipped minor versions, and mixed-version clusters.
+      behind on {{ kubernetes_upgrade_previous_minor }}.x. A completed
+      control-plane upgrade with remaining workers one minor behind is also
+      resumed safely. This protects against downgrades, skipped minor versions,
+      and unsafe mixed-version clusters.
   when: kubernetes_upgrade_unsupported_state | bool
   run_once: true
 
