@@ -43,6 +43,7 @@
     mode: '0644'
   with_items:
     - { src: "app.conf", dest: "/etc/nginx/conf.d/app.conf"}
+    - { src: "ollyvapes.conf", dest: "/etc/nginx/conf.d/ollyvapes.conf"}
 
 - name: Start service httpd, if not started
   ansible.builtin.service:
